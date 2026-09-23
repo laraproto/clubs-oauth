@@ -52,7 +52,7 @@ export const auth = betterAuth({
 	},
 	hooks: {
 		after: createAuthMiddleware(async (ctx) => {
-			if (!ctx.path.startsWith('/oauth2/callback')) {
+			if (!ctx.path.startsWith('/callback')) {
 				return;
 			}
 
@@ -77,6 +77,8 @@ export const auth = betterAuth({
 			if (!ADMIN_EMAILS?.includes(ctx.context.newSession.user.email)) {
 				return;
 			}
+
+			console.log(`Granting admin role to ${ctx.context.newSession.user.email}`);
 
 			ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
 				role: 'admin'

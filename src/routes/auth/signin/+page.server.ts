@@ -1,5 +1,10 @@
 import type { PageServerLoad } from './$types';
+import { superValidate } from 'sveltekit-superforms';
+import { formSchema } from './schema';
+import { zod4 } from 'sveltekit-superforms/adapters';
 
-export const load = (async () => {
-	return {};
-}) satisfies PageServerLoad;
+export const load: PageServerLoad = async () => {
+	return {
+		form: await superValidate(zod4(formSchema))
+	};
+};
