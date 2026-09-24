@@ -1,7 +1,8 @@
 import type { PageServerLoad, Actions } from './$types';
-import { fail, superValidate } from 'sveltekit-superforms';
+import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { formSchema } from './schema';
 import { zod4 } from 'sveltekit-superforms/adapters';
+import clubApi from '#lib/server/clubs';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -17,6 +18,29 @@ export const actions = {
 				form
 			});
 		}
+
+		const isMember = await clubApi.GET('/member/email', {
+			params: {
+				query: {
+					email: form.data.email
+				}
+			}
+		});
+
+		const isLeader = await clubApi.GET('/leader', {
+			params: {
+				query: {
+					email: form.data.email
+				}
+			}
+		});
+
+		const inAClub = (isMember.data && isMember.data.length > 0) || !!isLeader.data;
+
+		if (!inAClub) {
+			return setError(form, 'email', 'No club membership found for this email.');
+		}
+
 		return {
 			form
 		};
