@@ -1,5 +1,5 @@
-import type { PageServerLoad } from './$types';
-import { superValidate } from 'sveltekit-superforms';
+import type { PageServerLoad, Actions } from './$types';
+import { fail, superValidate } from 'sveltekit-superforms';
 import { formSchema } from './schema';
 import { zod4 } from 'sveltekit-superforms/adapters';
 
@@ -8,3 +8,17 @@ export const load: PageServerLoad = async () => {
 		form: await superValidate(zod4(formSchema))
 	};
 };
+
+export const actions = {
+	default: async (event) => {
+		const form = await superValidate(event, zod4(formSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+		return {
+			form
+		};
+	}
+} satisfies Actions;
