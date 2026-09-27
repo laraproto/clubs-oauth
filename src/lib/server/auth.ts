@@ -7,13 +7,14 @@ import {
 } from '$app/env/private';
 import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2';
-import { jwt, admin, genericOAuth } from 'better-auth/plugins';
+import { jwt, admin, genericOAuth, emailOTP } from 'better-auth/plugins';
 import { oauthProvider } from '@better-auth/oauth-provider';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { getRequestEvent } from '$app/server';
 import { db } from '#lib/server/db';
 import * as schema from '#lib/server/db/schema';
-import { createAuthMiddleware } from 'better-auth/api';
+import { APIError, createAuthMiddleware } from 'better-auth/api';
+import clubApi from '#lib/server/clubs';
 
 export const auth = betterAuth({
 	baseURL: ORIGIN,
@@ -35,6 +36,15 @@ export const auth = betterAuth({
 		}),
 		admin(),
 		jwt(),
+		emailOTP({
+			overrideDefaultEmailVerification: false,
+			sendVerificationOTP: async ({ email, otp, type }) => {
+				if (type !== 'sign-in') {
+					return;
+				}
+				console.log(`Sending OTP ${otp} to ${email}`);
+			}
+		}),
 		oauthProvider({
 			loginPage: '/auth/signin',
 			consentPage: '/auth/consent'
@@ -83,6 +93,47 @@ export const auth = betterAuth({
 			ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
 				role: 'admin'
 			});
+		}),
+		before: createAuthMiddleware(async (ctx) => {
+			if (!ctx.path.startsWith('/email-otp')) {
+				return;
+			}
+
+			if (!ctx.body.email) {
+				throw new APIError('BAD_REQUEST', { message: 'Email is required.' });
+			}
+
+			const [isMemberOk, isMemberError, isMember] = await clubApi.get('/member/email', {
+				queryParams: {
+					email: ctx.body.email
+				},
+				parseAs: 'text'
+			});
+
+			const [isLeaderOk, isLeaderError, isLeader] = await clubApi.get('/leader', {
+				queryParams: {
+					email: ctx.body.email
+				}
+			});
+
+			if (!isMemberOk || !isLeaderOk) {
+				console.error(isMemberError || isLeaderError);
+				throw new APIError('BAD_REQUEST', {
+					message: 'Error checking club membership.',
+					cause: isMemberError || isLeaderError
+				});
+			}
+
+			const inAClub =
+				(isMember && isMember.length > 0) ||
+				(typeof isLeader === 'object' &&
+					isLeader !== null &&
+					'club_name' in isLeader &&
+					isLeader.club_name!.length > 0);
+
+			if (!inAClub) {
+				throw new APIError('BAD_REQUEST', { message: 'No club membership found for this email.' });
+			}
 		})
 	}
 });

@@ -11,7 +11,9 @@ declare global {
 
 		// interface Error {}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			otp?: boolean;
+		}
 		// interface Platform {}
 	}
 }

@@ -1,6 +1,10 @@
 <script lang="ts">
 	import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end';
 	import LoginForm from './login-form.svelte';
+	import { page } from '$app/state';
+	import OtpForm from './otp-form.svelte';
+
+	let email = $state('');
 
 	let { data } = $props();
 </script>
@@ -19,7 +23,11 @@
 		</div>
 		<div class="flex flex-1 items-center justify-center">
 			<div class="w-full max-w-xs">
-				<LoginForm form={data.form} />
+				{#if !page.state.otp}
+					<LoginForm form={data.form} bind:email />
+				{:else}
+					<OtpForm form={data.otpForm} {email} />
+				{/if}
 			</div>
 		</div>
 	</div>
