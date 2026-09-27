@@ -27,11 +27,10 @@
 	// svelte-ignore state_referenced_locally
 	const form = superForm(initialForm, {
 		validators: zod4Client(formSchema),
-		onUpdated({ form }) {
+		onUpdate({ form }) {
 			if (!form.valid) {
 				return;
 			}
-			console.log(form.data);
 			email = form.data.email;
 		},
 		onResult({ result }) {

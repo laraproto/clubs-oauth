@@ -57,42 +57,99 @@ export const auth = betterAuth({
 				type: ['member', 'leader'],
 				required: false,
 				input: false
+			},
+			clubName: {
+				type: 'string',
+				required: false,
+				input: false
 			}
 		}
 	},
 	hooks: {
 		after: createAuthMiddleware(async (ctx) => {
-			if (!ctx.path.startsWith('/callback')) {
-				return;
+			switch (true) {
+				case ctx.path.startsWith('/callback'): {
+					if (!ctx.context.newSession) {
+						break;
+					}
+
+					if (!ctx.request) {
+						break;
+					}
+
+					const accounts = await ctx.context.internalAdapter.findAccountByUserId(
+						ctx.context.newSession.user.id
+					);
+
+					const hca = accounts.find((account) => account.providerId === 'hackclub');
+
+					if (!hca) {
+						break;
+					}
+
+					const isAdmin = ADMIN_EMAILS?.includes(ctx.context.newSession.user.email);
+
+					if (!isAdmin || ctx.context.newSession.user.role === 'user') {
+						break;
+					}
+
+					console.log(
+						`Granting ${isAdmin ? 'admin' : 'user'} role to ${ctx.context.newSession.user.email}`
+					);
+
+					ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
+						role: isAdmin ? 'admin' : 'user'
+					});
+
+					break;
+				}
+				case ctx.path.startsWith('/sign-in/email-otp'): {
+					if (!ctx.body.email) {
+						break;
+					}
+
+					if (!ctx.context.newSession) {
+						break;
+					}
+
+					const [memberClubOk, memberClubError, memberClub] = await clubApi.get('/member/email', {
+						queryParams: {
+							email: ctx.body.email
+						},
+						parseAs: 'text'
+					});
+
+					const [leaderClubOk, leaderClubError, leaderClub] = await clubApi.get('/leader', {
+						queryParams: {
+							email: ctx.body.email
+						}
+					});
+
+					if (!memberClubOk || !leaderClubOk) {
+						console.error(memberClubError || leaderClubError);
+						break;
+					}
+
+					// shitty ai code
+					const clubName =
+						(memberClub && memberClub.length > 0 ? memberClub : null) ||
+						(typeof leaderClub === 'object' &&
+						leaderClub !== null &&
+						'club_name' in leaderClub &&
+						leaderClub.club_name!.length > 0
+							? leaderClub.club_name
+							: null);
+
+					const clubRole = memberClub && memberClub.length > 0 ? 'member' : 'leader';
+
+					await ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
+						clubName,
+						clubRole
+					});
+
+					break;
+				}
 			}
-
-			if (!ctx.context.newSession) {
-				return;
-			}
-
-			if (!ctx.request) {
-				return;
-			}
-
-			const accounts = await ctx.context.internalAdapter.findAccountByUserId(
-				ctx.context.newSession.user.id
-			);
-
-			const hca = accounts.find((account) => account.providerId === 'hackclub');
-
-			if (!hca) {
-				return;
-			}
-
-			if (!ADMIN_EMAILS?.includes(ctx.context.newSession.user.email)) {
-				return;
-			}
-
-			console.log(`Granting admin role to ${ctx.context.newSession.user.email}`);
-
-			ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
-				role: 'admin'
-			});
 		}),
 		before: createAuthMiddleware(async (ctx) => {
 			if (!ctx.path.startsWith('/email-otp')) {
@@ -124,6 +181,7 @@ export const auth = betterAuth({
 				});
 			}
 
+			// shitty ai code
 			const inAClub =
 				(isMember && isMember.length > 0) ||
 				(typeof isLeader === 'object' &&
