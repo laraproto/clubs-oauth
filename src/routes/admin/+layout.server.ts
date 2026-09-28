@@ -1,8 +1,9 @@
+import { SIDEBAR_COOKIE_NAME } from '#lib/components/ui/sidebar/constants';
 import { auth } from '#lib/server/auth';
 import type { LayoutServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 
-export const load = (async ({ locals }) => {
+export const load = (async ({ locals, cookies }) => {
 	if (!locals.user) {
 		const result = await auth.api.signInSocial({
 			body: {
@@ -21,5 +22,8 @@ export const load = (async ({ locals }) => {
 		redirect(302, '/');
 	}
 
-	return {};
+	return {
+		user: locals.user,
+		sidebarOpen: cookies.get(SIDEBAR_COOKIE_NAME) === 'true'
+	};
 }) satisfies LayoutServerLoad;

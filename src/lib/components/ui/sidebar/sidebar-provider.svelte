@@ -1,18 +1,20 @@
 <script lang="ts">
-	import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-	import { cn, type WithElementRef } from "#lib/utils.js";
+	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
+	import type { Auth } from '#lib/server/auth.js';
+	import { cn, type WithElementRef } from '#lib/utils.js';
 	import {
 		SIDEBAR_COOKIE_MAX_AGE,
 		SIDEBAR_COOKIE_NAME,
 		SIDEBAR_WIDTH,
-		SIDEBAR_WIDTH_ICON,
-	} from "./constants.js";
-	import { setSidebar } from "./context.svelte.js";
-	import type { HTMLAttributes } from "svelte/elements";
+		SIDEBAR_WIDTH_ICON
+	} from './constants.js';
+	import { setSidebar } from './context.svelte.js';
+	import type { HTMLAttributes } from 'svelte/elements';
 
 	let {
 		ref = $bindable(null),
 		open = $bindable(true),
+		user,
 		onOpenChange = () => {},
 		class: className,
 		style,
@@ -20,18 +22,23 @@
 		...restProps
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		open?: boolean;
+		user: Auth['$Infer']['Session']['user'];
 		onOpenChange?: (open: boolean) => void;
 	} = $props();
 
 	const sidebar = setSidebar({
 		open: () => open,
+		user: () => user,
 		setOpen: (value: boolean) => {
 			open = value;
 			onOpenChange(value);
 
-			// This sets the cookie to keep the sidebar state.
-			document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-		},
+			cookieStore.set({
+				name: SIDEBAR_COOKIE_NAME,
+				value: String(open),
+				expires: Date.now() + SIDEBAR_COOKIE_MAX_AGE
+			});
+		}
 	});
 </script>
 
@@ -42,7 +49,7 @@
 		data-slot="sidebar-wrapper"
 		style="--sidebar-width: {SIDEBAR_WIDTH}; --sidebar-width-icon: {SIDEBAR_WIDTH_ICON}; {style}"
 		class={cn(
-			"group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
+			'group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar',
 			className
 		)}
 		bind:this={ref}

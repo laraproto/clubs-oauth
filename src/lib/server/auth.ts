@@ -89,7 +89,7 @@ export const auth = betterAuth({
 
 					const isAdmin = ADMIN_EMAILS?.includes(ctx.context.newSession.user.email);
 
-					if (!isAdmin || ctx.context.newSession.user.role === 'user') {
+					if (!isAdmin && ctx.context.newSession.user.role === 'user') {
 						break;
 					}
 
@@ -195,3 +195,5 @@ export const auth = betterAuth({
 		})
 	}
 });
+
+export type Auth = typeof auth;
