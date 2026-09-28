@@ -14,7 +14,11 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true,
 				experimental: { async: true }
 			},
-			adapter: adapter(),
+			adapter: adapter({
+				buildOptions: {
+					compile: true
+				}
+			}),
 			experimental: { remoteFunctions: true }
 		})
 	],

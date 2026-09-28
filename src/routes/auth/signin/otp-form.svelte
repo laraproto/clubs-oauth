@@ -5,7 +5,6 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
-	import SuperDebug from 'sveltekit-superforms/SuperDebug.svelte';
 	import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
 	import { otpFormSchema, type OtpFormSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
@@ -58,7 +57,6 @@
 				Enter the 6-digit OTP sent to your email.
 			</p>
 		</div>
-		<SuperDebug data={$formData} />
 		{#if $errors._errors || $message}
 			<Alert.Root variant={$errors._errors ? 'destructive' : 'default'} class="mb-4">
 				{#if $errors._errors}<AlertCircleIcon />
