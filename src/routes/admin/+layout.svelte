@@ -3,6 +3,7 @@
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import AppSidebar from '#lib/components/app-sidebar.svelte';
+	import { page } from '$app/state';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -14,16 +15,28 @@
 		<header class="flex h-16 shrink-0 items-center gap-2">
 			<div class="flex items-center gap-2 px-4">
 				<Sidebar.Trigger class="-ms-1" />
-				<Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
+				<Separator orientation="vertical" class="me-2 data-vertical:h-4 data-vertical:self-auto" />
 				<Breadcrumb.Root>
+					{@const segments = page.url.pathname.split('/').filter(Boolean)}
 					<Breadcrumb.List>
-						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="/admin">Admin</Breadcrumb.Link>
-						</Breadcrumb.Item>
-						<Breadcrumb.Separator class="hidden md:block" />
-						<Breadcrumb.Item>
-							<Breadcrumb.Page>Meow</Breadcrumb.Page>
-						</Breadcrumb.Item>
+						{#each segments as segment, index (index)}
+							{@const isLast = index === segments.length - 1}
+							<Breadcrumb.Item class="hidden md:block">
+								{#if !isLast}
+									<Breadcrumb.Link href={'/' + segments.slice(0, index + 1).join('/')}>
+										{segment.slice(0, 1).toUpperCase() + segment.slice(1)}
+									</Breadcrumb.Link>
+								{:else}
+									<Breadcrumb.Page
+										>{segment.slice(0, 1).toUpperCase() + segment.slice(1)}</Breadcrumb.Page
+									>
+								{/if}
+							</Breadcrumb.Item>
+
+							{#if !isLast}
+								<Breadcrumb.Separator class="hidden md:block" />
+							{/if}
+						{/each}
 					</Breadcrumb.List>
 				</Breadcrumb.Root>
 			</div>

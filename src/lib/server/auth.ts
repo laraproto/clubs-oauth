@@ -3,7 +3,8 @@ import {
 	APP_SECRET,
 	OAUTH_CLIENT_ID,
 	OAUTH_CLIENT_SECRET,
-	ADMIN_EMAILS
+	ADMIN_EMAILS,
+	SMTP_FROM
 } from '$app/env/private';
 import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2';
@@ -15,12 +16,16 @@ import { db } from '#lib/server/db';
 import * as schema from '#lib/server/db/schema';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
 import clubApi from '#lib/server/clubs';
+import transporter from '#lib/server/mail';
+import render from '../emails';
+import OtpEmail from '#lib/emails/otpEmail.svelte';
 
 export const auth = betterAuth({
-	baseURL: ORIGIN,
+	baseURL: {
+		allowedHosts: [new URL(ORIGIN ?? 'http://localhost:5173').host]
+	},
 	secret: APP_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg', schema }),
-	emailAndPassword: { enabled: true },
 	plugins: [
 		genericOAuth({
 			config: [
@@ -43,6 +48,12 @@ export const auth = betterAuth({
 					return;
 				}
 				console.log(`Sending OTP ${otp} to ${email}`);
+				void transporter.sendMail({
+					from: SMTP_FROM,
+					to: email,
+					subject: 'Your OTP Code',
+					html: await render(OtpEmail, { props: { code: otp, origin: ORIGIN } })
+				});
 			}
 		}),
 		oauthProvider({
@@ -51,6 +62,9 @@ export const auth = betterAuth({
 		}),
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	],
+	advanced: {
+		trustedProxyHeaders: true
+	},
 	user: {
 		additionalFields: {
 			clubRole: {
@@ -115,8 +129,7 @@ export const auth = betterAuth({
 					const [memberClubOk, memberClubError, memberClub] = await clubApi.get('/member/email', {
 						queryParams: {
 							email: ctx.body.email
-						},
-						parseAs: 'text'
+						}
 					});
 
 					const [leaderClubOk, leaderClubError, leaderClub] = await clubApi.get('/leader', {
@@ -132,7 +145,9 @@ export const auth = betterAuth({
 
 					// shitty ai code
 					const clubName =
-						(memberClub && memberClub.length > 0 ? memberClub : null) ||
+						(memberClub.club_name && memberClub.club_name.length > 0
+							? memberClub.club_name
+							: null) ||
 						(typeof leaderClub === 'object' &&
 						leaderClub !== null &&
 						'club_name' in leaderClub &&
@@ -140,7 +155,10 @@ export const auth = betterAuth({
 							? leaderClub.club_name
 							: null);
 
-					const clubRole = memberClub && memberClub.length > 0 ? 'member' : 'leader';
+					const clubRole =
+						memberClub && memberClub.club_name && memberClub.club_name.length > 0
+							? 'member'
+							: 'leader';
 
 					await ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
 						clubName,

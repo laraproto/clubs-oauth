@@ -1,21 +1,20 @@
 <script lang="ts">
-	import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
-	import FolderIcon from "@lucide/svelte/icons/folder";
-	import ShareIcon from "@lucide/svelte/icons/share";
-	import Trash2Icon from "@lucide/svelte/icons/trash-2";
-	import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
-	import * as Sidebar from "#lib/components/ui/sidebar/index.js";
-	import { useSidebar } from "#lib/components/ui/sidebar/index.js";
+	import EllipsisIcon from '@lucide/svelte/icons/ellipsis';
+	import FolderIcon from '@lucide/svelte/icons/folder';
+	import ShareIcon from '@lucide/svelte/icons/share';
+	import Trash2Icon from '@lucide/svelte/icons/trash-2';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
+	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
+	import { useSidebar } from '#lib/components/ui/sidebar/index.js';
+	import type { Component } from 'svelte';
 
 	let {
-		projects,
+		apps
 	}: {
-		projects: {
+		apps: {
 			name: string;
 			url: string;
-			// This should be `Component` after @lucide/svelte updates types
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			icon: any;
+			icon: Component;
 		}[];
 	} = $props();
 
@@ -25,7 +24,7 @@
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
 	<Sidebar.GroupLabel>Projects</Sidebar.GroupLabel>
 	<Sidebar.Menu>
-		{#each projects as item (item.name)}
+		{#each apps as item (item.name)}
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton>
 					{#snippet child({ props })}
@@ -46,8 +45,8 @@
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content
 						class="w-48"
-						side={sidebar.isMobile ? "bottom" : "right"}
-						align={sidebar.isMobile ? "end" : "start"}
+						side={sidebar.isMobile ? 'bottom' : 'right'}
+						align={sidebar.isMobile ? 'end' : 'start'}
 					>
 						<DropdownMenu.Item>
 							<FolderIcon class="text-muted-foreground" />
@@ -66,11 +65,20 @@
 				</DropdownMenu.Root>
 			</Sidebar.MenuItem>
 		{/each}
-		<Sidebar.MenuItem>
-			<Sidebar.MenuButton>
-				<EllipsisIcon />
-				<span>More</span>
-			</Sidebar.MenuButton>
-		</Sidebar.MenuItem>
+		{#if apps.length === 0}
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton>
+					<span>No Projects</span>
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+		{/if}
+		{#if apps.length > 4}
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton>
+					<EllipsisIcon />
+					<span>More</span>
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+		{/if}
 	</Sidebar.Menu>
 </Sidebar.Group>

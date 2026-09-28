@@ -1,4 +1,5 @@
 import type { PageServerLoad, Actions } from './$types';
+import { redirect } from '@sveltejs/kit';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { formSchema, otpFormSchema } from './schema';
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -27,7 +28,8 @@ export const actions = {
 				body: {
 					email: form.data.email,
 					type: 'sign-in'
-				}
+				},
+				headers: event.request.headers
 			});
 
 			if (!result.success) {
@@ -59,9 +61,15 @@ export const actions = {
 			}
 		});
 
-		if (!memberNameOk) {
-			console.error(memberNameError);
-			return setError(form, 'otp', 'Error fetching member name.');
+		const [leaderNameOk, leaderNameError, leaderName] = await clubApi.get('/leader/name', {
+			queryParams: {
+				email: form.data.email
+			}
+		});
+
+		if (!memberNameOk || !leaderNameOk) {
+			console.error(memberNameError || leaderNameError);
+			return setError(form, 'otp', 'Error fetching member/leader name.');
 		}
 
 		try {
@@ -69,7 +77,7 @@ export const actions = {
 				body: {
 					email: form.data.email,
 					otp: form.data.otp,
-					name: memberName?.name
+					name: memberName?.name || leaderName?.name
 				},
 				headers: event.request.headers
 			});
@@ -81,8 +89,6 @@ export const actions = {
 			return setError(form, 'otp', 'Unknown error.');
 		}
 
-		return {
-			form
-		};
+		return redirect(303, decodeURIComponent(event.url.searchParams.get('returnTo') ?? '/'));
 	}
 } satisfies Actions;

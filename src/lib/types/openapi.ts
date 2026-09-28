@@ -556,6 +556,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/leader/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get leader's name by email
+         * @description Returns the name associated with a leader by email. Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Email of the leader */
+                    email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Leader name */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name?: string;
+                        };
+                    };
+                };
+                /** @description Missing email parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing email parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Leader not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Leader not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/leader/change": {
         parameters: {
             query?: never;
@@ -1003,7 +1083,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": {
+                            club_name?: string | null;
+                        };
                     };
                 };
                 /** @description Missing email parameter */
@@ -1161,7 +1243,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": {
+                            club_name?: string | null;
+                        };
                     };
                 };
                 /** @description Missing slackid parameter */

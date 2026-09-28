@@ -26,5 +26,24 @@ export const variables = defineEnvVars({
 		schema: building
 			? z.optional(z.string().transform((value) => value.split(',').map((email) => email.trim())))
 			: z.string().transform((value) => value.split(',').map((email) => email.trim()))
+	},
+	SMTP_HOST: {
+		description: 'The SMTP host for sending emails.'
+	},
+	SMTP_PORT: {
+		description: 'The SMTP port for sending emails.',
+		schema: z.string().transform((value) => parseInt(value, 10))
+	},
+	SMTP_FROM: {
+		description: 'The SMTP from address for sending emails.',
+		schema: z.string()
+	},
+	SMTP_USER: {
+		description: 'The SMTP username for sending emails.',
+		schema: z.optional(z.string())
+	},
+	SMTP_PASS: {
+		description: 'The SMTP password for sending emails.',
+		schema: z.optional(z.string())
 	}
 });
