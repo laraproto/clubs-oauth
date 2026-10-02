@@ -8,7 +8,7 @@ import {
 } from '$app/env/private';
 import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2';
-import { jwt, admin, genericOAuth, emailOTP } from 'better-auth/plugins';
+import { jwt, admin, genericOAuth, emailOTP, multiSession } from 'better-auth/plugins';
 import { oauthProvider } from '@better-auth/oauth-provider';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { getRequestEvent } from '$app/server';
@@ -47,7 +47,6 @@ export const auth = betterAuth({
 				if (type !== 'sign-in') {
 					return;
 				}
-				console.log(`Sending OTP ${otp} to ${email}`);
 				void transporter.sendMail({
 					from: SMTP_FROM,
 					to: email,
@@ -59,6 +58,9 @@ export const auth = betterAuth({
 		oauthProvider({
 			loginPage: '/auth/signin',
 			consentPage: '/auth/consent'
+		}),
+		multiSession({
+			maximumSessions: 3
 		}),
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	],
