@@ -1,6 +1,23 @@
 <script lang="ts" module>
-	export const data = {
-		navMain: [],
+	import FolderKanbanIcon from '@lucide/svelte/icons/folder-kanban';
+	import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard';
+
+	export const data: {
+		navMain: ComponentProps<typeof NavMain>['items'];
+		projects: ComponentProps<typeof NavProjects>['apps'];
+	} = {
+		navMain: [
+			{
+				title: 'Dashboard',
+				icon: LayoutDashboardIcon,
+				url: '/admin/overview'
+			},
+			{
+				title: 'Applications',
+				icon: FolderKanbanIcon,
+				url: '/admin/applications'
+			}
+		],
 		projects: []
 	};
 </script>
@@ -22,7 +39,7 @@
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton size="lg">
 					{#snippet child({ props })}
-						<a href="##" {...props}>
+						<a href="/admin/overview" {...props}>
 							<div
 								class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
 							>

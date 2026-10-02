@@ -17,7 +17,7 @@
 				<Sidebar.Trigger class="-ms-1" />
 				<Separator orientation="vertical" class="me-2 data-vertical:h-4 data-vertical:self-auto" />
 				<Breadcrumb.Root>
-					{@const segments = page.url.pathname.split('/').filter(Boolean)}
+					{@const segments = page.route.id?.split('/').filter(Boolean) || ['admin']}
 					<Breadcrumb.List>
 						{#each segments as segment, index (index)}
 							{@const isLast = index === segments.length - 1}

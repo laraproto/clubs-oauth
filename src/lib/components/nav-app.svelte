@@ -1,11 +1,6 @@
 <script lang="ts">
 	import EllipsisIcon from '@lucide/svelte/icons/ellipsis';
-	import FolderIcon from '@lucide/svelte/icons/folder';
-	import ShareIcon from '@lucide/svelte/icons/share';
-	import Trash2Icon from '@lucide/svelte/icons/trash-2';
-	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
-	import { useSidebar } from '#lib/components/ui/sidebar/index.js';
 	import type { Component } from 'svelte';
 
 	let {
@@ -17,68 +12,39 @@
 			icon: Component;
 		}[];
 	} = $props();
-
-	const sidebar = useSidebar();
 </script>
 
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
-	<Sidebar.GroupLabel>Projects</Sidebar.GroupLabel>
-	<Sidebar.Menu>
-		{#each apps as item (item.name)}
-			<Sidebar.MenuItem>
-				<Sidebar.MenuButton>
-					{#snippet child({ props })}
-						<a href={item.url} {...props}>
-							<item.icon />
-							<span>{item.name}</span>
-						</a>
-					{/snippet}
-				</Sidebar.MenuButton>
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger>
+	<Sidebar.GroupLabel>Applications</Sidebar.GroupLabel>
+	<Sidebar.GroupContent class="flex flex-col gap-2">
+		<Sidebar.Menu>
+			{#each apps as item (item.name)}
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton>
 						{#snippet child({ props })}
-							<Sidebar.MenuAction showOnHover {...props}>
-								<EllipsisIcon />
-								<span class="sr-only">More</span>
-							</Sidebar.MenuAction>
+							<a href={item.url} {...props}>
+								<item.icon />
+								<span>{item.name}</span>
+							</a>
 						{/snippet}
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content
-						class="w-48"
-						side={sidebar.isMobile ? 'bottom' : 'right'}
-						align={sidebar.isMobile ? 'end' : 'start'}
-					>
-						<DropdownMenu.Item>
-							<FolderIcon class="text-muted-foreground" />
-							<span>View Project</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item>
-							<ShareIcon class="text-muted-foreground" />
-							<span>Share Project</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item>
-							<Trash2Icon class="text-muted-foreground" />
-							<span>Delete Project</span>
-						</DropdownMenu.Item>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-			</Sidebar.MenuItem>
-		{/each}
-		{#if apps.length === 0}
-			<Sidebar.MenuItem>
-				<Sidebar.MenuButton>
-					<span>No Projects</span>
-				</Sidebar.MenuButton>
-			</Sidebar.MenuItem>
-		{/if}
-		{#if apps.length > 4}
-			<Sidebar.MenuItem>
-				<Sidebar.MenuButton>
-					<EllipsisIcon />
-					<span>More</span>
-				</Sidebar.MenuButton>
-			</Sidebar.MenuItem>
-		{/if}
-	</Sidebar.Menu>
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{/each}
+			{#if apps.length === 0}
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton>
+						<span>No Applications</span>
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{/if}
+			{#if apps.length > 4}
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton>
+						<EllipsisIcon />
+						<span>More</span>
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{/if}
+		</Sidebar.Menu>
+	</Sidebar.GroupContent>
 </Sidebar.Group>

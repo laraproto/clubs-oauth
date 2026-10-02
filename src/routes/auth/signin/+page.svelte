@@ -12,18 +12,25 @@
 <div class="grid min-h-svh lg:grid-cols-2">
 	<div class="flex flex-col gap-4 p-6 md:p-10">
 		<div class="flex justify-center gap-2 md:justify-start">
-			<a href="##" class="flex items-center gap-2 font-medium">
+			<span class="flex items-center gap-2 font-medium">
 				<div
-					class="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground"
+					class={[
+						'flex size-12 items-center justify-center rounded-md text-primary-foreground',
+						!data.oauthClient?.logo_uri && 'bg-primary'
+					]}
 				>
-					<GalleryVerticalEndIcon class="size-4" />
+					{#if data.oauthClient?.logo_uri}
+						<img src={data.oauthClient.logo_uri} alt="logo" class="size-12 rounded-md" />
+					{:else}
+						<GalleryVerticalEndIcon class="size-12" />
+					{/if}
 				</div>
-				Nest Git
-			</a>
+				{data.oauthClient?.client_name ?? 'Clubs OAuth'}
+			</span>
 		</div>
 		<div class="flex flex-1 items-center justify-center">
 			<div class="w-full max-w-xs">
-				{#if !page.state.otp}
+				{#if !page.state.modal}
 					<LoginForm form={data.form} bind:email />
 				{:else}
 					<OtpForm form={data.otpForm} {email} />

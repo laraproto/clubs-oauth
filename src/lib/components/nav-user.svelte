@@ -24,13 +24,14 @@
 						class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 					>
 						<Avatar.Root class="size-8 rounded-lg">
-							<Avatar.Image src={sidebar.user.image} alt={sidebar.user.name} />
+							<Avatar.Image src={sidebar.user.image} alt={sidebar.user.name.split(' ')[0]} />
 							<Avatar.Fallback class="rounded-lg"
 								>{sidebar.user.name.charAt(0).toUpperCase()}</Avatar.Fallback
 							>
 						</Avatar.Root>
 						<div class="grid flex-1 text-start text-sm leading-tight">
-							<span class="truncate font-medium">{sidebar.user.name}</span>
+							<!-- Is this so I don't deadname myself? Maybe - Lara -->
+							<span class="truncate font-medium">{sidebar.user.name.split(' ')[0]}</span>
 							<span class="truncate text-xs">{sidebar.user.email}</span>
 						</div>
 						<ChevronsUpDownIcon class="ms-auto size-4" />
@@ -52,7 +53,7 @@
 							>
 						</Avatar.Root>
 						<div class="grid flex-1 text-start text-sm leading-tight">
-							<span class="truncate font-medium">{sidebar.user.name}</span>
+							<span class="truncate font-medium">{sidebar.user.name.split(' ')[0]}</span>
 							<span class="truncate text-xs">{sidebar.user.email}</span>
 						</div>
 					</div>

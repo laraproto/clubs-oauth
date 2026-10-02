@@ -8,7 +8,7 @@ import {
 } from '$app/env/private';
 import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2';
-import { jwt, admin, genericOAuth, emailOTP, multiSession } from 'better-auth/plugins';
+import { jwt, admin, genericOAuth, emailOTP /*, multiSession*/ } from 'better-auth/plugins';
 import { oauthProvider } from '@better-auth/oauth-provider';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { getRequestEvent } from '$app/server';
@@ -59,9 +59,9 @@ export const auth = betterAuth({
 			loginPage: '/auth/signin',
 			consentPage: '/auth/consent'
 		}),
-		multiSession({
+		/*multiSession({
 			maximumSessions: 3
-		}),
+		}),*/
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	],
 	advanced: {

@@ -12,6 +12,7 @@
 	import { cn, type WithElementRef } from '#lib/utils';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 
 	let {
 		ref = $bindable(null),
@@ -32,6 +33,17 @@
 		},
 		onUpdate({ form }) {
 			form.data.email = email;
+		},
+		onResult({ result }) {
+			if (result.type !== 'success') {
+				return;
+			}
+
+			if (!page.url.searchParams.has('redirect_uri')) {
+				document.location.href = decodeURIComponent(page.url.searchParams.get('returnTo') ?? '/');
+			} else {
+				document.location.href = `/auth/consent?${page.url.searchParams.toString()}`;
+			}
 		}
 	});
 

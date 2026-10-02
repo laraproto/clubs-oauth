@@ -40,7 +40,7 @@
 			}
 			goto('', {
 				state: {
-					otp: true
+					modal: true
 				},
 				shallow: true
 			});

@@ -1,16 +1,36 @@
 import type { PageServerLoad, Actions } from './$types';
-import { redirect } from '@sveltejs/kit';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { formSchema, otpFormSchema } from './schema';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import clubApi from '#lib/server/clubs';
 import { APIError } from 'better-auth';
 import { auth } from '#lib/server/auth';
+import type { OAuthClient } from '@better-auth/oauth-provider';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ request, url }) => {
+	let oauthClient: OAuthClient | null = null;
+
+	if (url.searchParams.has('client_id')) {
+		try {
+			oauthClient = await auth.api.getOAuthClientPublic({
+				headers: request.headers,
+				query: {
+					client_id: url.searchParams.get('client_id')!
+				}
+			});
+		} catch (err) {
+			if (err instanceof APIError) {
+				console.error(err);
+			} else if (err instanceof Error) {
+				throw err;
+			}
+		}
+	}
+
 	return {
 		form: await superValidate(zod4(formSchema)),
-		otpForm: await superValidate(zod4(otpFormSchema))
+		otpForm: await superValidate(zod4(otpFormSchema)),
+		oauthClient
 	};
 };
 
@@ -88,7 +108,5 @@ export const actions = {
 			console.error(err);
 			return setError(form, 'otp', 'Unknown error.');
 		}
-
-		return redirect(303, decodeURIComponent(event.url.searchParams.get('returnTo') ?? '/'));
 	}
 } satisfies Actions;

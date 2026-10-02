@@ -19,7 +19,7 @@ export const load = (async ({ locals, request, cookies }) => {
 		}
 	}
 
-	if ((locals.user as typeof locals.user & { role?: string }).role !== 'admin') {
+	if (locals.user.role !== 'admin') {
 		return redirect(302, '/');
 	}
 
@@ -27,6 +27,7 @@ export const load = (async ({ locals, request, cookies }) => {
 
 	return {
 		user: locals.user,
+
 		sidebarOpen: cookie ? cookie === 'true' : true
 	};
 }) satisfies LayoutServerLoad;

@@ -26,7 +26,7 @@ export type SidebarStateProps = {
 class SidebarState {
 	readonly props: SidebarStateProps;
 	open = $derived.by(() => this.props.open());
-	user = $derived.by(() => this.props.user());
+	user: Auth['$Infer']['Session']['user'] = $derived.by(() => this.props.user());
 	openMobile = $state(false);
 	setOpen: SidebarStateProps['setOpen'];
 	#isMobile: IsMobile;
