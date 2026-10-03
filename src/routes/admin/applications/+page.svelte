@@ -16,7 +16,11 @@
 		<a href={resolve('/admin/applications/[app]', { app: app.clientId })}>
 			<Card.Root class="relative mx-auto w-full max-w-sm pt-0">
 				<div class="absolute inset-0 z-15 aspect-video bg-black/35"></div>
-				<img src={app.icon} alt={app.name} class="relative z-20 aspect-video w-full object-cover" />
+				<img
+					src={app.icon || 'https://placehold.co/600x400?text=No+Image'}
+					alt={app.name}
+					class="relative z-20 aspect-video w-full object-cover"
+				/>
 				<Card.Header>
 					<Card.Title>{app.name}</Card.Title>
 				</Card.Header>
