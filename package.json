@@ -78,5 +78,8 @@
 	},
 	"dependencies": {
 		"feature-fetch": "^0.1.2"
+	},
+	"patchedDependencies": {
+		"@better-auth/oauth-provider@1.7.7": "patches/@better-auth%2Foauth-provider@1.7.7.patch"
 	}
 }

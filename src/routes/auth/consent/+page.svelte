@@ -8,8 +8,7 @@
 	const authConsent = async (params: { consent: boolean }) => {
 		try {
 			const result = await authConsentCommand(params);
-			console.log(result);
-			if (result.redirect) {
+			if (result && result.redirect) {
 				window.location.href = result.url;
 			}
 		} catch (err) {
@@ -24,14 +23,14 @@
 			<span class="flex items-center gap-2 font-medium">
 				<div
 					class={[
-						'flex size-12 items-center justify-center rounded-md text-primary-foreground',
+						'flex size-10 items-center justify-center rounded-md text-primary-foreground',
 						!data.oauthClient?.logo_uri && 'bg-primary'
 					]}
 				>
 					{#if data.oauthClient?.logo_uri}
-						<img src={data.oauthClient.logo_uri} alt="logo" class="size-12 rounded-md" />
+						<img src={data.oauthClient.logo_uri} alt="logo" class="size-10 rounded-md" />
 					{:else}
-						<GalleryVerticalEndIcon class="size-10	" />
+						<GalleryVerticalEndIcon class="size-8" />
 					{/if}
 				</div>
 				{data.oauthClient?.client_name ?? 'Clubs OAuth'}

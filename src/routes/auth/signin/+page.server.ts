@@ -12,10 +12,11 @@ export const load: PageServerLoad = async ({ request, url }) => {
 
 	if (url.searchParams.has('client_id')) {
 		try {
-			oauthClient = await auth.api.getOAuthClientPublic({
+			oauthClient = await auth.api.getOAuthClientPublicPrelogin({
 				headers: request.headers,
-				query: {
-					client_id: url.searchParams.get('client_id')!
+				body: {
+					client_id: url.searchParams.get('client_id')!,
+					oauth_query: url.searchParams.toString()
 				}
 			});
 		} catch (err) {

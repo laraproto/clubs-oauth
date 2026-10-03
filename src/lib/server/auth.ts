@@ -57,7 +57,8 @@ export const auth = betterAuth({
 		}),
 		oauthProvider({
 			loginPage: '/auth/signin',
-			consentPage: '/auth/consent'
+			consentPage: '/auth/consent',
+			allowPublicClientPrelogin: true
 		}),
 		/*multiSession({
 			maximumSessions: 3

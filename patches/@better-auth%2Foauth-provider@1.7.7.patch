@@ -1,0 +1,46 @@
+diff --git a/dist/authorize-K1WHCNih.mjs b/dist/authorize-K1WHCNih.mjs
+index 892e39ff5f37078ee30b8c950be5f12adf96262e..7e08ae369aacf4870825c591ccc843a7c17e0f90 100644
+--- a/dist/authorize-K1WHCNih.mjs
++++ b/dist/authorize-K1WHCNih.mjs
+@@ -5500,11 +5500,11 @@ function authorizeRedirectOnError(opts) {
+ }
+ async function authorizeEndpoint(ctx, opts, settings) {
+ 	if (opts.grantTypes && !opts.grantTypes.includes("authorization_code")) throw new APIError$1("NOT_FOUND");
+-	if (!ctx.request) throw new APIError$1("UNAUTHORIZED", {
+-		error_description: "request not found",
++	const headers = ctx.request?.headers ?? ctx.headers;
++	if (!headers) throw new APIError$1("UNAUTHORIZED", {
++		error_description: "request headers not found",
+ 		error: "invalid_request"
+ 	});
+-	const request = ctx.request;
+ 	let query = getAuthorizationRequestParameters(ctx, settings);
+ 	ctx.query = query;
+ 	const requestObject = getStringParameter(query.request);
+@@ -5639,7 +5639,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
+ 	if (settings?.isAuthorize && promptSet?.has("select_account")) return redirectWithPromptCode(ctx, opts, "select_account");
+ 	if (settings?.isAuthorize && opts.selectAccount) {
+ 		if (await opts.selectAccount.shouldRedirect({
+-			headers: request.headers,
++			headers: headers,
+ 			user: session.user,
+ 			session: session.session,
+ 			scopes: requestedScopes
+@@ -5650,7 +5650,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
+ 	}
+ 	if (opts.signup?.shouldRedirect) {
+ 		const signupRedirect = await opts.signup.shouldRedirect({
+-			headers: request.headers,
++			headers: headers,
+ 			user: session.user,
+ 			session: session.session,
+ 			scopes: requestedScopes
+@@ -5662,7 +5662,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
+ 	}
+ 	if (!settings?.postLogin && opts.postLogin) {
+ 		if (await opts.postLogin.shouldRedirect({
+-			headers: request.headers,
++			headers: headers,
+ 			user: session.user,
+ 			session: session.session,
+ 			scopes: requestedScopes
