@@ -4,12 +4,14 @@ import { superValidate, setError, fail } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { auth } from '#lib/server/auth';
 import { APIError } from 'better-auth/api';
+import { getApps } from '../data.remote';
 
-export const load = (async () => {
+export const load = (async ({ request }) => {
 	return {
 		applicationForm: await superValidate(zod4(createApplicationSchema), {
 			id: 'create-application'
-		})
+		}),
+		applications: await getApps()
 	};
 }) satisfies PageServerLoad;
 

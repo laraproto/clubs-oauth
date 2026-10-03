@@ -6,8 +6,13 @@ import clubApi from '#lib/server/clubs';
 import { APIError } from 'better-auth';
 import { auth } from '#lib/server/auth';
 import type { OAuthClient } from '@better-auth/oauth-provider';
+import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ request, url }) => {
+export const load: PageServerLoad = async ({ request, url, locals }) => {
+	if (locals.user || locals.session) {
+		return redirect(302, decodeURIComponent(url.searchParams.get('return_to') || '/'));
+	}
+
 	let oauthClient: OAuthClient | null = null;
 
 	if (url.searchParams.has('client_id')) {

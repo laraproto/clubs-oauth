@@ -11,6 +11,7 @@
 	import { cn, type WithElementRef } from '#lib/utils';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { goto } from '$app/navigation';
+	import Head from '#lib/components/head.svelte';
 
 	let {
 		ref = $bindable(null),
@@ -49,6 +50,8 @@
 
 	const { form: formData, errors, message, enhance } = form;
 </script>
+
+<Head title="Club Member Login" />
 
 <form
 	class={cn('flex flex-col gap-6', className)}

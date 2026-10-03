@@ -13,6 +13,7 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import Head from '#lib/components/head.svelte';
 
 	let {
 		ref = $bindable(null),
@@ -40,7 +41,7 @@
 			}
 
 			if (!page.url.searchParams.has('redirect_uri')) {
-				document.location.href = decodeURIComponent(page.url.searchParams.get('returnTo') ?? '/');
+				document.location.href = decodeURIComponent(page.url.searchParams.get('return_to') ?? '/');
 			} else {
 				document.location.href = `/auth/consent?${page.url.searchParams.toString()}`;
 			}
@@ -53,6 +54,8 @@
 		$formData.email = email;
 	});
 </script>
+
+<Head title="Club Member Login" />
 
 <form
 	class={cn('flex flex-col gap-6', className)}

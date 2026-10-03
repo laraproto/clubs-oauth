@@ -1,7 +1,9 @@
 import { SIDEBAR_COOKIE_NAME } from '#lib/components/ui/sidebar/constants';
 import { auth } from '#lib/server/auth';
+import { APIError } from 'better-auth/api';
 import type { LayoutServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
+import type { OAuthClient } from '@better-auth/oauth-provider';
 
 export const load = (async ({ locals, request, cookies }) => {
 	if (!locals.user) {
@@ -25,9 +27,24 @@ export const load = (async ({ locals, request, cookies }) => {
 
 	const cookie = cookies.get(SIDEBAR_COOKIE_NAME);
 
+	// eslint-disable-next-line no-useless-assignment
+	let oauthClients: OAuthClient[] | null = [];
+
+	try {
+		const result = await auth.api.getOAuthClients({
+			headers: request.headers
+		});
+		oauthClients = result;
+	} catch (err) {
+		if (err instanceof APIError) {
+			return error(500, err.message);
+		}
+		throw err;
+	}
+
 	return {
 		user: locals.user,
-
+		oauthClients,
 		sidebarOpen: cookie ? cookie === 'true' : true
 	};
 }) satisfies LayoutServerLoad;

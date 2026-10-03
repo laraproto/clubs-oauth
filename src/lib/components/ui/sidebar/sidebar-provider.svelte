@@ -2,6 +2,7 @@
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import type { Auth } from '#lib/server/auth.js';
 	import { cn, type WithElementRef } from '#lib/utils.js';
+	import type { OAuthClient } from '@better-auth/oauth-provider';
 	import {
 		SIDEBAR_COOKIE_MAX_AGE,
 		SIDEBAR_COOKIE_NAME,
@@ -15,6 +16,7 @@
 		ref = $bindable(null),
 		open = $bindable(true),
 		user,
+		oauthClients,
 		onOpenChange = () => {},
 		class: className,
 		style,
@@ -23,12 +25,14 @@
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		open?: boolean;
 		user: Auth['$Infer']['Session']['user'];
+		oauthClients: OAuthClient[] | null;
 		onOpenChange?: (open: boolean) => void;
 	} = $props();
 
 	const sidebar = setSidebar({
 		open: () => open,
 		user: () => user,
+		oauthClients: () => oauthClients,
 		setOpen: (value: boolean) => {
 			open = value;
 			onOpenChange(value);

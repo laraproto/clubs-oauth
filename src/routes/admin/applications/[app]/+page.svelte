@@ -1,11 +1,8 @@
 <script lang="ts">
 	import Head from '#lib/components/head.svelte';
 	import type { PageProps } from './$types';
-	import CreateApp from './create-app.svelte';
 
 	let { data }: PageProps = $props();
 </script>
 
-<Head title="Admin Applications" />
-
-<CreateApp form={data.applicationForm} />
+<Head title={`Admin Application: ${data.app?.name}`} />

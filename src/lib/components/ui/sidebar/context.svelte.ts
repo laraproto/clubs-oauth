@@ -2,6 +2,7 @@ import { getContext, setContext } from 'svelte';
 import { IsMobile } from '#lib/hooks/is-mobile.svelte.js';
 import { SIDEBAR_KEYBOARD_SHORTCUT } from './constants.js';
 import type { Auth } from '#lib/server/auth';
+import type { OAuthClient } from '@better-auth/oauth-provider';
 
 type Getter<T> = () => T;
 
@@ -15,6 +16,8 @@ export type SidebarStateProps = {
 
 	user: Getter<Auth['$Infer']['Session']['user']>;
 
+	oauthClients: Getter<OAuthClient[] | null>;
+
 	/**
 	 * A function that sets the open state of the sidebar. To support `bind:open`, we need
 	 * a source of truth for changing the open state to ensure it will be synced throughout
@@ -27,6 +30,7 @@ class SidebarState {
 	readonly props: SidebarStateProps;
 	open = $derived.by(() => this.props.open());
 	user: Auth['$Infer']['Session']['user'] = $derived.by(() => this.props.user());
+	oauthClients: OAuthClient[] | null = $derived.by(() => this.props.oauthClients());
 	openMobile = $state(false);
 	setOpen: SidebarStateProps['setOpen'];
 	#isMobile: IsMobile;
