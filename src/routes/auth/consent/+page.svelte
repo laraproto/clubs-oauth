@@ -54,12 +54,18 @@
 				</div>
 			</div>
 		</div>
+		<span class="ml-auto hidden lg:block"
+			>Photo taken at <a
+				class="text-primary underline transition-all hover:opacity-80"
+				href="https://midnight.hackclub.com">Midnight 2026</a
+			></span
+		>
 	</div>
 	<div class="relative hidden bg-muted lg:block">
 		<img
-			src="/placeholder.svg"
-			alt="placeholder"
-			class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+			src="https://photos.hackclub.com/share/sKl4NEZ_4szo/raw"
+			alt="Midnight 2026"
+			class="absolute inset-0 h-full w-full object-cover"
 		/>
 	</div>
 </div>

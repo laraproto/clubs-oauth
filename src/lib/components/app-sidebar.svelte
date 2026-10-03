@@ -4,21 +4,19 @@
 
 	export const data: {
 		navMain: ComponentProps<typeof NavMain>['items'];
-		projects: ComponentProps<typeof NavProjects>['apps'];
 	} = {
 		navMain: [
 			{
 				title: 'Dashboard',
 				icon: LayoutDashboardIcon,
-				url: '/admin/overview'
+				url: '/admin/dashboard'
 			},
 			{
 				title: 'Applications',
 				icon: FolderKanbanIcon,
 				url: '/admin/applications'
 			}
-		],
-		projects: []
+		]
 	};
 </script>
 
@@ -56,7 +54,7 @@
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<NavMain items={data.navMain} />
-		<NavProjects apps={data.projects} />
+		<NavProjects />
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<NavUser />

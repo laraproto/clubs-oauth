@@ -112,7 +112,7 @@
 				</div>
 			</div>
 			<Dialog.Footer class="sm:justify-end">
-				<Dialog.Close type="button" class={buttonVariants()}>Close</Dialog.Close>
+				<Dialog.Close type="reset" class={buttonVariants()}>Close</Dialog.Close>
 				<Form.Button>Submit</Form.Button>
 			</Dialog.Footer>
 		</form>

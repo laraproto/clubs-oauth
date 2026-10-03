@@ -11,6 +11,7 @@
 	import { cn, type WithElementRef } from '#lib/utils';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { goto } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import Head from '#lib/components/head.svelte';
 
 	let {
@@ -25,28 +26,30 @@
 		email: string;
 	} = $props();
 
-	// svelte-ignore state_referenced_locally
-	const form = superForm(initialForm, {
-		validators: zod4Client(formSchema),
-		onUpdate({ form }) {
-			if (!form.valid) {
-				return;
+	const form = superForm(
+		untrack(() => initialForm),
+		{
+			validators: zod4Client(formSchema),
+			onUpdate({ form }) {
+				if (!form.valid) {
+					return;
+				}
+				email = form.data.email;
+			},
+			onResult({ result }) {
+				if (result.type !== 'success') {
+					email = '';
+					return;
+				}
+				goto('', {
+					state: {
+						modal: true
+					},
+					shallow: true
+				});
 			}
-			email = form.data.email;
-		},
-		onResult({ result }) {
-			if (result.type !== 'success') {
-				email = '';
-				return;
-			}
-			goto('', {
-				state: {
-					modal: true
-				},
-				shallow: true
-			});
 		}
-	});
+	);
 
 	const { form: formData, errors, message, enhance } = form;
 </script>

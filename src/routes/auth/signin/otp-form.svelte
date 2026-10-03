@@ -11,7 +11,7 @@
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { cn, type WithElementRef } from '#lib/utils';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/state';
 	import Head from '#lib/components/head.svelte';
 
@@ -26,27 +26,31 @@
 		email: string;
 	} = $props();
 
-	// svelte-ignore state_referenced_locally
-	const form = superForm(initialForm, {
-		validators: zod4Client(otpFormSchema),
-		onSubmit({ formData }) {
-			formData.set('email', email);
-		},
-		onUpdate({ form }) {
-			form.data.email = email;
-		},
-		onResult({ result }) {
-			if (result.type !== 'success') {
-				return;
-			}
+	const form = superForm(
+		untrack(() => initialForm),
+		{
+			validators: zod4Client(otpFormSchema),
+			onSubmit({ formData }) {
+				formData.set('email', email);
+			},
+			onUpdate({ form }) {
+				form.data.email = email;
+			},
+			onResult({ result }) {
+				if (result.type !== 'success') {
+					return;
+				}
 
-			if (!page.url.searchParams.has('redirect_uri')) {
-				document.location.href = decodeURIComponent(page.url.searchParams.get('return_to') ?? '/');
-			} else {
-				document.location.href = `/auth/consent?${page.url.searchParams.toString()}`;
+				if (!page.url.searchParams.has('redirect_uri')) {
+					document.location.href = decodeURIComponent(
+						page.url.searchParams.get('return_to') ?? '/'
+					);
+				} else {
+					document.location.href = `/auth/consent?${page.url.searchParams.toString()}`;
+				}
 			}
 		}
-	});
+	);
 
 	const { form: formData, errors, message, enhance } = form;
 
