@@ -70,8 +70,8 @@
 					class="cursor-pointer"
 					onclick={async () => {
 						await signout();
-						await goto(resolve('/'), {
-							invalidateAll: true
+						await goto(resolve('/auth/signin'), {
+							refreshAll: true
 						});
 					}}
 				>

@@ -40,7 +40,7 @@
 					<Breadcrumb.List>
 						{#each segments as segment, index (index)}
 							{@const isLast = index === segments.length - 1}
-							<Breadcrumb.Item class="hidden md:block">
+							<Breadcrumb.Item class="block">
 								{#if !isLast}
 									<Breadcrumb.Link href={'/' + segments.slice(0, index + 1).join('/')}>
 										{segment.slice(0, 1).toUpperCase() + segment.slice(1)}
@@ -86,7 +86,7 @@
 							</Breadcrumb.Item>
 
 							{#if !isLast}
-								<Breadcrumb.Separator class="hidden md:block" />
+								<Breadcrumb.Separator class="block" />
 							{/if}
 						{/each}
 					</Breadcrumb.List>

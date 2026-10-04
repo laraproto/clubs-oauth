@@ -15,6 +15,9 @@ export const getApp = query(z.string(), async (id: string) => {
 	const app = await db.query.oauthClient.findFirst({
 		where: {
 			clientId: id
+		},
+		with: {
+			user: true
 		}
 	});
 

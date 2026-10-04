@@ -18,7 +18,6 @@ import { APIError, createAuthMiddleware } from 'better-auth/api';
 import clubApi from '#lib/server/clubs';
 import transporter from '#lib/server/mail';
 import render from '../emails';
-import OtpEmail from '#lib/emails/otpEmail.svelte';
 
 export const auth = betterAuth({
 	baseURL: {
@@ -47,18 +46,24 @@ export const auth = betterAuth({
 				if (type !== 'sign-in') {
 					return;
 				}
+				const OtpEmail = await import('#lib/emails/otpEmail.svelte');
 				void transporter.sendMail({
 					from: SMTP_FROM,
 					to: email,
 					subject: 'Your OTP Code',
-					html: await render(OtpEmail, { props: { code: otp, origin: ORIGIN } })
+					html: await render(OtpEmail.default, { props: { code: otp, origin: ORIGIN } })
 				});
 			}
 		}),
 		oauthProvider({
 			loginPage: '/auth/signin',
 			consentPage: '/auth/consent',
-			allowPublicClientPrelogin: true
+			allowPublicClientPrelogin: true,
+			clientPrivileges: async (ctx) => {
+				if (ctx.user && ctx.user.role === 'admin') {
+					return true;
+				}
+			}
 		}),
 		/*multiSession({
 			maximumSessions: 3

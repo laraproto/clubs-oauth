@@ -25,7 +25,7 @@ export const authConsent = command(z.object({ consent: z.boolean() }), async (da
 	} catch (err) {
 		if (err instanceof APIError) {
 			console.error(err);
-			error(500, err.body?.error);
+			return error(500, err.body?.error);
 		}
 		console.error(err);
 	}
