@@ -6,7 +6,7 @@ import { auth } from '#lib/server/auth';
 import { APIError } from 'better-auth/api';
 import { getApps } from '../data.remote';
 
-export const load = (async ({ request }) => {
+export const load = (async () => {
 	return {
 		applicationForm: await superValidate(zod4(createApplicationSchema), {
 			id: 'create-application'
@@ -29,6 +29,7 @@ export const actions = {
 				headers: event.request.headers,
 				body: {
 					client_name: form.data.name,
+					client_uri: form.data.uri,
 					logo_uri: form.data.logo,
 					scope: form.data.scopes,
 					redirect_uris: form.data.redirectUris,

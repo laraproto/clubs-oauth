@@ -52,6 +52,16 @@
 						<Form.Description>Application name to show on consent page.</Form.Description>
 						<Form.FieldErrors />
 					</Form.Field>
+					<Form.Field {form} name="uri">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>URI</Form.Label>
+								<Input {...props} bind:value={$formData.uri} />
+							{/snippet}
+						</Form.Control>
+						<Form.Description>Optional URI to link back to application.</Form.Description>
+						<Form.FieldErrors />
+					</Form.Field>
 					<Form.Field {form} name="logo">
 						<Form.Control>
 							{#snippet children({ props })}

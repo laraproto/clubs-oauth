@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const createApplicationSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
+	uri: z.url('URI must be a valid URL').optional(),
 	logo: z.httpUrl('Logo must be a valid URL').optional(),
 	scopes: z.string().default('openid profile email'),
 	redirectUris: z
