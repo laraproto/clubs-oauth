@@ -26,6 +26,7 @@
 				})) || []
 		}
 	};
+	// /admin/applications/[app]
 </script>
 
 <Sidebar.Provider oauthClients={data.oauthClients} user={data.user} open={data.sidebarOpen}>
@@ -48,7 +49,7 @@
 								{:else}
 									{#if slugMap[segment as keyof typeof slugMap]}
 										{@const name = await slugMap[segment as keyof typeof slugMap].getPath()}
-										{#if (await slugMap[segment as keyof typeof slugMap].getList) && (await slugMap[segment as keyof typeof slugMap].getList()).length > 1}
+										{#if slugMap[segment as keyof typeof slugMap].getList && (await slugMap[segment as keyof typeof slugMap].getList()).length > 1}
 											<DropdownMenu.Root>
 												<DropdownMenu.Trigger class="flex items-center gap-1">
 													{name}

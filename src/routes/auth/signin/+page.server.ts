@@ -92,5 +92,19 @@ export const actions = {
 			console.error(err);
 			return setError(form, 'otp', 'Unknown error.');
 		}
+	},
+	hca: async (event) => {
+		const result = await auth.api.signInSocial({
+			body: {
+				provider: 'hackclub',
+				callbackURL: '/user'
+			},
+			headers: event.request.headers
+		});
+		if (result.url) {
+			return redirect(303, result.url, { external: true });
+		} else {
+			return redirect(303, '/');
+		}
 	}
 } satisfies Actions;

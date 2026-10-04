@@ -20,7 +20,7 @@
 	let newClientSecret = $state<string | null>(null);
 </script>
 
-<Head title={`Admin Application: ${data.app?.name}`} />
+<Head title={`Admin Application: ${data.app?.name || 'Not Found'}`} />
 
 {#if data.app}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
@@ -187,38 +187,49 @@
 			</div>
 		</div>
 	</div>
+
+	<ConfirmDialog
+		bind:open={dialogState.resetClientSecretDialogOpen}
+		variant="destructive"
+		title="Regenerate Client Secret"
+		description="Are you sure you want to invalidate the client secret? It will be invalidated immediately."
+		onConfirm={async () => {
+			const result = await rotateClientSecret(data.app?.clientId || '');
+			newClientSecret = result || null;
+			dialogState.resetClientSecretDialogOpen = false;
+		}}
+	/>
+
+	<ConfirmDialog
+		bind:open={dialogState.revokeAccessTokensDialogOpen}
+		variant="destructive"
+		title="Revoke Access Tokens"
+		description="Are you sure you want to revoke all access tokens for this application? This action cannot be undone."
+		onConfirm={async () => {
+			await revokeAuthorization(data.app?.clientId || '');
+			dialogState.revokeAccessTokensDialogOpen = false;
+		}}
+	/>
+
+	<ConfirmDialog
+		bind:open={dialogState.deleteApplicationDialogOpen}
+		variant="destructive"
+		title="Delete Application"
+		description="Are you sure you want to delete this application? This action cannot be undone."
+		onConfirm={async () => {
+			await deleteApp(data.app?.clientId || '');
+			dialogState.deleteApplicationDialogOpen = false;
+		}}
+	/>
+{:else}
+	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
+		<Card.Root class="mx-auto w-full max-w-sm">
+			<Card.Header>
+				<Card.Title>Application Not Found</Card.Title>
+			</Card.Header>
+			<Card.Content>
+				The application you are looking for does not exist or has been deleted.
+			</Card.Content>
+		</Card.Root>
+	</div>
 {/if}
-
-<ConfirmDialog
-	bind:open={dialogState.resetClientSecretDialogOpen}
-	variant="destructive"
-	title="Regenerate Client Secret"
-	description="Are you sure you want to invalidate the client secret? It will be invalidated immediately."
-	onConfirm={async () => {
-		const result = await rotateClientSecret(data.app?.clientId || '');
-		newClientSecret = result || null;
-		dialogState.resetClientSecretDialogOpen = false;
-	}}
-/>
-
-<ConfirmDialog
-	bind:open={dialogState.revokeAccessTokensDialogOpen}
-	variant="destructive"
-	title="Revoke Access Tokens"
-	description="Are you sure you want to revoke all access tokens for this application? This action cannot be undone."
-	onConfirm={async () => {
-		await revokeAuthorization(data.app?.clientId || '');
-		dialogState.revokeAccessTokensDialogOpen = false;
-	}}
-/>
-
-<ConfirmDialog
-	bind:open={dialogState.deleteApplicationDialogOpen}
-	variant="destructive"
-	title="Delete Application"
-	description="Are you sure you want to delete this application? This action cannot be undone."
-	onConfirm={async () => {
-		await deleteApp(data.app?.clientId || '');
-		dialogState.deleteApplicationDialogOpen = false;
-	}}
-/>
