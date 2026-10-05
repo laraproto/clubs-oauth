@@ -9,7 +9,9 @@ declare global {
 		}
 
 		// interface Error {}
-		// interface PageData {}
+		interface PageData {
+			flash?: { type: 'success' | 'error' | 'info'; message: string };
+		}
 		interface PageState {
 			modal?: boolean;
 		}

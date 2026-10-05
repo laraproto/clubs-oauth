@@ -10,6 +10,7 @@
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { cn, type WithElementRef } from '#lib/utils';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { untrack } from 'svelte';
 	import Head from '#lib/components/head.svelte';
@@ -106,7 +107,7 @@
 	</form>
 	<FieldSeparator>Or continue with</FieldSeparator>
 	<Field>
-		<form method="POST" action="?/hca" use:sveltekitEnhance>
+		<form method="POST" action={`?/hca&${page.url.searchParams.toString()}`} use:sveltekitEnhance>
 			<Button variant="outline" type="submit" class="w-full">
 				<img
 					src="https://assets.hackclub.com/icon-rounded.svg"

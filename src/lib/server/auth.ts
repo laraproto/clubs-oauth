@@ -84,6 +84,11 @@ export const auth = betterAuth({
 				type: 'string',
 				required: false,
 				input: false
+			},
+			slackId: {
+				type: 'string',
+				required: false,
+				input: false
 			}
 		}
 	},
@@ -109,28 +114,42 @@ export const auth = betterAuth({
 						break;
 					}
 
-					const isAdmin = ADMIN_EMAILS?.includes(ctx.context.newSession.user.email);
+					const fetchUserInfoResponse = await fetch('https://auth.hackclub.com/oauth/userinfo', {
+						headers: {
+							Authorization: `Bearer ${hca.accessToken}`
+						}
+					});
 
-					if (!isAdmin && ctx.context.newSession.user.role === 'user') {
+					if (!fetchUserInfoResponse.ok) {
+						console.error('Failed to fetch user info from Hack Club OAuth provider.');
 						break;
 					}
 
-					console.log(
-						`Granting ${isAdmin ? 'admin' : 'user'} role to ${ctx.context.newSession.user.email}`
+					const userInfo = await fetchUserInfoResponse.json();
+
+					const slackInfoResponse = await fetch(
+						`https://cachet.hackclub.com/users/${userInfo.slack_id}`
 					);
 
+					if (!slackInfoResponse.ok) {
+						console.error('Failed to fetch user info from Hack Club Cachet API.');
+						break;
+					}
+
+					const slackInfo = await slackInfoResponse.json();
+
+					const isAdmin = ADMIN_EMAILS?.includes(ctx.context.newSession.user.email);
+
 					ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
-						role: isAdmin ? 'admin' : 'user'
+						role: isAdmin ? 'admin' : 'user',
+						slackId: userInfo.slack_id,
+						image: slackInfo.imageUrl
 					});
 
 					break;
 				}
 				case ctx.path.startsWith('/sign-in/email-otp'): {
 					if (!ctx.body.email) {
-						break;
-					}
-
-					if (!ctx.context.newSession) {
 						break;
 					}
 
@@ -168,10 +187,15 @@ export const auth = betterAuth({
 							? 'member'
 							: 'leader';
 
-					await ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
-						clubName,
-						clubRole
-					});
+					if (ctx.context.newSession?.user.id && ctx.context.session?.user.id) {
+						await ctx.context.internalAdapter.updateUser(
+							ctx.context.newSession?.user.id || ctx.context.session?.user.id,
+							{
+								clubName,
+								clubRole
+							}
+						);
+					}
 
 					break;
 				}

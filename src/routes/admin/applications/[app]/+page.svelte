@@ -3,18 +3,27 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import * as Avatar from '#lib/components/ui/avatar/index.js';
+	import { Separator } from '#lib/components/ui/separator/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import type { PageProps } from './$types';
-	import { deleteApp, revokeAuthorization, rotateClientSecret } from './data.remote';
+	import {
+		deleteApp,
+		revokeAuthorization,
+		rotateClientSecret,
+		transferOwnership
+	} from './data.remote';
 	import ConfirmDialog from '#lib/components/confirm-dialog.svelte';
+	import { refreshAll } from '$app/navigation';
 
 	let { data }: PageProps = $props();
 
 	let dialogState = $state({
 		resetClientSecretDialogOpen: false,
 		revokeAccessTokensDialogOpen: false,
-		deleteApplicationDialogOpen: false
+		deleteApplicationDialogOpen: false,
+		transferOwnershipDialogOpen: false
 	});
 
 	let newClientSecret = $state<string | null>(null);
@@ -185,6 +194,37 @@
 					</Card.Content>
 				</Card.Root>
 			</div>
+			<div class="lg:col-span-2">
+				<Card.Root class="h-full">
+					<Card.Header>
+						<Card.Title>Collaborators (in the near future)</Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<span class="flex flex-row items-center py-4">
+							<Avatar.Root class="size-6 rounded-lg">
+								<Avatar.Image
+									src={data.app.user?.image}
+									alt={data.app.user?.name?.charAt(0).toUpperCase()}
+								/>
+								<Avatar.Fallback>{data.app.user?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
+							</Avatar.Root>
+							<div class="flex flex-1 items-center justify-between gap-2">
+								<span>
+									<span class="ml-2 text-sm font-medium">{data.app.user?.name.split(' ')[0]}</span>
+									<span class="text-muted-foreground">({data.app.user?.email})</span>
+								</span>
+								<!-- put the owner text at the end of the row -->
+								<span class="block">Owner</span>
+							</div>
+						</span>
+						<Separator class="my-2" />
+						<Button class="w-full" onclick={() => (dialogState.transferOwnershipDialogOpen = true)}
+							>Transfer Ownership</Button
+						>
+						<Button class="mt-2 w-full" disabled>Add Collaborator</Button>
+					</Card.Content>
+				</Card.Root>
+			</div>
 		</div>
 	</div>
 
@@ -221,6 +261,25 @@
 			dialogState.deleteApplicationDialogOpen = false;
 		}}
 	/>
+
+	{let newOwnerEmail = $state('')}
+	<ConfirmDialog
+		bind:open={dialogState.transferOwnershipDialogOpen}
+		title="Transfer Ownership"
+		description="Are you sure you want to transfer ownership of this application? Please make sure to get confirmation beforehand from the Clubs team"
+		onConfirm={async () => {
+			await transferOwnership({ app: data.app?.clientId || '', newOwnerEmail });
+			await refreshAll();
+			dialogState.transferOwnershipDialogOpen = false;
+		}}
+	>
+		<Input
+			placeholder="Enter the email of the new owner"
+			type="email"
+			class="my-2"
+			bind:value={newOwnerEmail}
+		/>
+	</ConfirmDialog>
 {:else}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<Card.Root class="mx-auto w-full max-w-sm">

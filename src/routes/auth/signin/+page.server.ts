@@ -59,6 +59,9 @@ export const actions = {
 			});
 		}
 
+		const params = event.url.searchParams;
+		params.delete('/otp');
+
 		const [memberNameOk, memberNameError, memberName] = await clubApi.get('/member/name', {
 			queryParams: {
 				email: form.data.email
@@ -85,6 +88,12 @@ export const actions = {
 				},
 				headers: event.request.headers
 			});
+
+			if (params.has('redirect_uri')) {
+				return redirect(303, `/auth/consent?${params.toString()}`);
+			} else {
+				return redirect(303, decodeURIComponent(params.get('return_to') || '/user'));
+			}
 		} catch (err) {
 			if (err instanceof APIError) {
 				return setError(form, 'otp', err.message);
@@ -94,10 +103,15 @@ export const actions = {
 		}
 	},
 	hca: async (event) => {
+		const params = event.url.searchParams;
+		params.delete('/hca');
+
 		const result = await auth.api.signInSocial({
 			body: {
 				provider: 'hackclub',
-				callbackURL: '/user'
+				callbackURL: params.has('redirect_uri')
+					? `/auth/consent?${params.toString()}`
+					: decodeURIComponent(params.get('return_to') || '/user')
 			},
 			headers: event.request.headers
 		});

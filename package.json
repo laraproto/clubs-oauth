@@ -61,6 +61,8 @@
 		"shadcn-svelte": "^1.7.0",
 		"svelte": "^5.56.4",
 		"svelte-check": "^4.7.5",
+		"svelte-sonner": "^1.2.0",
+		"sveltekit-flash-message": "^3.0.0",
 		"sveltekit-superforms": "3.0.0-next.1",
 		"tailwind-variants": "^3.3.1",
 		"tailwindcss": "^4.3.0",

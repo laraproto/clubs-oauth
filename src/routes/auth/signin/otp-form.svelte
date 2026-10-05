@@ -12,7 +12,6 @@
 	import { cn, type WithElementRef } from '#lib/utils';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { onMount, untrack } from 'svelte';
-	import { page } from '$app/state';
 	import Head from '#lib/components/head.svelte';
 
 	let {
@@ -35,19 +34,6 @@
 			},
 			onUpdate({ form }) {
 				form.data.email = email;
-			},
-			onResult({ result }) {
-				if (result.type !== 'success') {
-					return;
-				}
-
-				if (!page.url.searchParams.has('redirect_uri')) {
-					document.location.href = decodeURIComponent(
-						page.url.searchParams.get('return_to') ?? '/'
-					);
-				} else {
-					document.location.href = `/auth/consent?${page.url.searchParams.toString()}`;
-				}
 			}
 		}
 	);
