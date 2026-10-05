@@ -13,7 +13,7 @@
 		revokeAuthorization,
 		rotateClientSecret,
 		transferOwnership
-	} from './data.remote';
+	} from '#lib/oauth.remote';
 	import ConfirmDialog from '#lib/components/confirm-dialog.svelte';
 	import { refreshAll } from '$app/navigation';
 
@@ -247,6 +247,7 @@
 		description="Are you sure you want to revoke all access tokens for this application? This action cannot be undone."
 		onConfirm={async () => {
 			await revokeAuthorization(data.app?.clientId || '');
+			await refreshAll();
 			dialogState.revokeAccessTokensDialogOpen = false;
 		}}
 	/>
@@ -258,6 +259,7 @@
 		description="Are you sure you want to delete this application? This action cannot be undone."
 		onConfirm={async () => {
 			await deleteApp(data.app?.clientId || '');
+			await refreshAll();
 			dialogState.deleteApplicationDialogOpen = false;
 		}}
 	/>

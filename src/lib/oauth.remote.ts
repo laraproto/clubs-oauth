@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { APIError } from 'better-auth/api';
 import { auth } from '#lib/server/auth';
 import { db } from '#lib/server/db';
-import { oauthAccessToken, oauthClient } from '#lib/server/db/schema';
+import * as schema from '#lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -13,7 +13,17 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 
 	const user = event.locals.user;
 
-	if (!user || user.role !== 'admin') {
+	const oauthClient = await db.query.oauthClient.findFirst({
+		where: {
+			clientId: app
+		}
+	});
+
+	if (!oauthClient) {
+		return error(404, 'App not found');
+	}
+
+	if (!user || user.role !== 'admin' || user.id !== oauthClient.userId) {
 		return error(401, 'Unauthorized');
 	}
 
@@ -37,9 +47,20 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 
 export const revokeAuthorization = command(z.string(), async (app) => {
 	const event = getRequestEvent();
+
 	const user = event.locals.user;
 
-	if (!user || user.role !== 'admin') {
+	const oauthClient = await db.query.oauthClient.findFirst({
+		where: {
+			clientId: app
+		}
+	});
+
+	if (!oauthClient) {
+		return error(404, 'App not found');
+	}
+
+	if (!user || user.role !== 'admin' || user.id !== oauthClient.userId) {
 		return error(401, 'Unauthorized');
 	}
 
@@ -57,16 +78,19 @@ export const revokeAuthorization = command(z.string(), async (app) => {
 	}
 
 	try {
+		let revokedCount = 0;
 		for (const token of tokens) {
 			await db
-				.update(oauthAccessToken)
+				.update(schema.oauthAccessToken)
 				.set({
 					revoked: new Date(),
 					sessionId: null
 				})
-				.where(eq(oauthAccessToken.id, token.id));
+				.where(eq(schema.oauthAccessToken.id, token.id));
 		}
-		return true;
+		revokedCount = tokens.length;
+		setFlash({ type: 'info', message: `Revoked ${revokedCount} access tokens` }, event.cookies);
+		return revokedCount;
 	} catch (err) {
 		console.error(err);
 		return error(500, 'Unknown error');
@@ -78,7 +102,17 @@ export const deleteApp = command(z.string(), async (app) => {
 
 	const user = event.locals.user;
 
-	if (!user || user.role !== 'admin') {
+	const oauthClient = await db.query.oauthClient.findFirst({
+		where: {
+			clientId: app
+		}
+	});
+
+	if (!oauthClient) {
+		return error(404, 'App not found');
+	}
+
+	if (!user || user.role !== 'admin' || user.id !== oauthClient.userId) {
 		return error(401, 'Unauthorized');
 	}
 
@@ -136,11 +170,11 @@ export const transferOwnership = command(
 
 		try {
 			await db
-				.update(oauthClient)
+				.update(schema.oauthClient)
 				.set({
 					userId: newUser.id
 				})
-				.where(eq(oauthClient.clientId, app));
+				.where(eq(schema.oauthClient.clientId, app));
 
 			setFlash({ type: 'success', message: 'Ownership transferred successfully' }, event.cookies);
 			return true;
