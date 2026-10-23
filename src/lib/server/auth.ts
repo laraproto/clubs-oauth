@@ -18,6 +18,7 @@ import { APIError, createAuthMiddleware } from 'better-auth/api';
 import clubApi from '#lib/server/clubs';
 import transporter from '#lib/server/mail';
 import render from '../emails';
+import { collaboratorDisallowedActions, type OAuthMetadata } from '#lib/types/oauth-metadata';
 
 export const auth = betterAuth({
 	baseURL: {
@@ -61,6 +62,38 @@ export const auth = betterAuth({
 			allowPublicClientPrelogin: true,
 			clientPrivileges: async (ctx) => {
 				if (ctx.user && ctx.user.role === 'admin') {
+					//return true;
+				}
+				if (ctx.action === 'list') {
+					return true;
+				}
+
+				if (!ctx.clientId) {
+					return false;
+				}
+
+				const oauthClient = await db.query.oauthClient.findFirst({
+					where: {
+						clientId: ctx.clientId
+					}
+				});
+
+				if (!oauthClient) {
+					return false;
+				}
+
+				if (oauthClient.userId === ctx.user?.id) {
+					return true;
+				}
+
+				const metadata = oauthClient.metadata as OAuthMetadata;
+
+				console.log('oauthClient metadata:', metadata);
+
+				if (
+					metadata?.collaborators?.includes(ctx.user?.email || '') &&
+					!collaboratorDisallowedActions.includes(ctx.action)
+				) {
 					return true;
 				}
 			}

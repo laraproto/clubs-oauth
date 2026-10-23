@@ -35,7 +35,7 @@
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 			<div class="flex flex-col gap-4 lg:col-span-1 lg:row-span-2 lg:gap-8">
-				<Card.Root class="relative mx-auto w-full max-w-sm pt-0">
+				<Card.Root class="relative mx-auto w-full  pt-0">
 					<div class="absolute inset-0 z-15 aspect-video bg-black/35"></div>
 					<img
 						src={data.app.icon || 'https://placehold.co/600x400?text=No+Image'}
@@ -46,7 +46,7 @@
 						<Card.Title class="flex flex-row items-center">
 							{data.app.name}
 							{#if data.app.uri}
-								<a href={data.app.uri}
+								<a href={data.app.uri} rel="external noopener noreferrer" target="_blank"
 									><LinkIcon
 										class="ml-2 size-4 text-muted-foreground hover:cursor-pointer hover:text-primary"
 									/></a
@@ -235,6 +235,7 @@
 		description="Are you sure you want to invalidate the client secret? It will be invalidated immediately."
 		onConfirm={async () => {
 			const result = await rotateClientSecret(data.app?.clientId || '');
+			await refreshAll();
 			newClientSecret = result || null;
 			dialogState.resetClientSecretDialogOpen = false;
 		}}

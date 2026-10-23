@@ -26,7 +26,7 @@
 				<Card.Title class="flex flex-row items-center">
 					{app.name}
 					{#if app.uri}
-						<a href={app.uri}
+						<a href={app.uri} rel="external noopener noreferrer" target="_blank"
 							><LinkIcon
 								class="ml-2 size-4 text-muted-foreground hover:cursor-pointer hover:text-primary"
 							/></a

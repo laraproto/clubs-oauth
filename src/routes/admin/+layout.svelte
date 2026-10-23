@@ -1,4 +1,5 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve */
 	import * as Breadcrumb from '#lib/components/ui/breadcrumb/index.js';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
@@ -26,7 +27,6 @@
 				})) || []
 		}
 	};
-	// /admin/applications/[app]
 </script>
 
 <Sidebar.Provider oauthClients={data.oauthClients} user={data.user} open={data.sidebarOpen}>

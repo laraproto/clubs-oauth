@@ -1,8 +1,8 @@
-diff --git a/dist/authorize-dkOG8GqZ.mjs b/dist/authorize-dkOG8GqZ.mjs
-index 3aff46628412fb5fd68ce5dbf694b8e46af2f65c..b92019ea69215d357a36d4b0890df6e2bdd8f415 100644
---- a/dist/authorize-dkOG8GqZ.mjs
-+++ b/dist/authorize-dkOG8GqZ.mjs
-@@ -5641,10 +5641,11 @@ function authorizeRedirectOnError(opts) {
+diff --git a/dist/authorize-D_jy3s-1.mjs b/dist/authorize-D_jy3s-1.mjs
+index e57ce0de3788c48444a39ef19671cf7d8fdd8569..601234c1bc21e59f81f6bbdd7a7f2dde80cc8bb3 100644
+--- a/dist/authorize-D_jy3s-1.mjs
++++ b/dist/authorize-D_jy3s-1.mjs
+@@ -5653,11 +5653,11 @@ function authorizeRedirectOnError(opts) {
  }
  async function authorizeEndpoint(ctx, opts, settings) {
  	if (opts.grantTypes && !opts.grantTypes.includes("authorization_code")) throw new APIError$1("NOT_FOUND");
@@ -10,15 +10,16 @@ index 3aff46628412fb5fd68ce5dbf694b8e46af2f65c..b92019ea69215d357a36d4b0890df6e2
 -		error_description: "request not found",
 -		error: "invalid_request"
 -	});
+-	const request = ctx.request;
 +	const headers = ctx.request?.headers ?? ctx.headers;
 +	if (!headers) throw new APIError$1("UNAUTHORIZED", {
 +		error_description: "request headers not found",
 + 		error: "invalid_request"
 + 	});
- 	const request = ctx.request;
  	let query = getAuthorizationRequestParameters(ctx, settings);
  	ctx.query = query;
-@@ -5780,7 +5781,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
+ 	const requestObject = getStringParameter(query.request);
+@@ -5792,7 +5792,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
  	if (settings?.isAuthorize && promptSet?.has("select_account")) return redirectWithPromptCode(ctx, opts, "select_account");
  	if (settings?.isAuthorize && opts.selectAccount) {
  		if (await opts.selectAccount.shouldRedirect({
@@ -27,7 +28,7 @@ index 3aff46628412fb5fd68ce5dbf694b8e46af2f65c..b92019ea69215d357a36d4b0890df6e2
  			user: session.user,
  			session: session.session,
  			scopes: requestedScopes
-@@ -5791,7 +5792,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
+@@ -5803,7 +5803,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
  	}
  	if (opts.signup?.shouldRedirect) {
  		const signupRedirect = await opts.signup.shouldRedirect({
@@ -36,7 +37,7 @@ index 3aff46628412fb5fd68ce5dbf694b8e46af2f65c..b92019ea69215d357a36d4b0890df6e2
  			user: session.user,
  			session: session.session,
  			scopes: requestedScopes
-@@ -5803,7 +5804,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
+@@ -5815,7 +5815,7 @@ async function authorizeEndpoint(ctx, opts, settings) {
  	}
  	if (!settings?.postLogin && opts.postLogin) {
  		if (await opts.postLogin.shouldRedirect({

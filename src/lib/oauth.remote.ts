@@ -5,13 +5,10 @@ import { auth } from '#lib/server/auth';
 import { db } from '#lib/server/db';
 import * as schema from '#lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 
 export const rotateClientSecret = command(z.string(), async (app) => {
 	const event = getRequestEvent();
-
-	const user = event.locals.user;
 
 	const oauthClient = await db.query.oauthClient.findFirst({
 		where: {
@@ -20,11 +17,8 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 	});
 
 	if (!oauthClient) {
-		return error(404, 'App not found');
-	}
-
-	if (!user || user.role !== 'admin' || user.id !== oauthClient.userId) {
-		return error(401, 'Unauthorized');
+		setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+		return false;
 	}
 
 	try {
@@ -35,21 +29,29 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 			headers: event.request.headers
 		});
 
+		setFlash({ type: 'success', message: 'Client secret rotated successfully' }, event.cookies);
 		return result.client_secret;
 	} catch (err) {
+		console.log(err);
 		if (err instanceof APIError) {
-			return error(500, err.message);
+			setFlash(
+				{
+					type: 'error',
+					message:
+						err.message.length > 0 ? err.message : 'Client not found or authorization missing'
+				},
+				event.cookies
+			);
+			return false;
 		}
 		console.error(err);
-		return error(500, 'Unknown error');
+		setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+		return false;
 	}
 });
 
 export const revokeAuthorization = command(z.string(), async (app) => {
 	const event = getRequestEvent();
-
-	const user = event.locals.user;
-
 	const oauthClient = await db.query.oauthClient.findFirst({
 		where: {
 			clientId: app
@@ -57,11 +59,14 @@ export const revokeAuthorization = command(z.string(), async (app) => {
 	});
 
 	if (!oauthClient) {
-		return error(404, 'App not found');
-	}
-
-	if (!user || user.role !== 'admin' || user.id !== oauthClient.userId) {
-		return error(401, 'Unauthorized');
+		setFlash(
+			{
+				type: 'error',
+				message: 'Client not found or authorization missing'
+			},
+			event.cookies
+		);
+		return false;
 	}
 
 	const tokens = await db.query.oauthAccessToken.findMany({
@@ -93,14 +98,13 @@ export const revokeAuthorization = command(z.string(), async (app) => {
 		return revokedCount;
 	} catch (err) {
 		console.error(err);
-		return error(500, 'Unknown error');
+		setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+		return false;
 	}
 });
 
 export const deleteApp = command(z.string(), async (app) => {
 	const event = getRequestEvent();
-
-	const user = event.locals.user;
 
 	const oauthClient = await db.query.oauthClient.findFirst({
 		where: {
@@ -109,11 +113,11 @@ export const deleteApp = command(z.string(), async (app) => {
 	});
 
 	if (!oauthClient) {
-		return error(404, 'App not found');
-	}
-
-	if (!user || user.role !== 'admin' || user.id !== oauthClient.userId) {
-		return error(401, 'Unauthorized');
+		setFlash(
+			{ type: 'error', message: 'Client not found or authorization missing' },
+			event.cookies
+		);
+		return false;
 	}
 
 	try {
@@ -127,10 +131,19 @@ export const deleteApp = command(z.string(), async (app) => {
 		return true;
 	} catch (err) {
 		if (err instanceof APIError) {
-			return error(500, err.message);
+			setFlash(
+				{
+					type: 'error',
+					message:
+						err.message.length > 0 ? err.message : 'Client not found or authorization missing'
+				},
+				event.cookies
+			);
+			return false;
 		}
 		console.error(err);
-		return error(500, 'Unknown error');
+		setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+		return false;
 	}
 });
 
@@ -142,7 +155,8 @@ export const transferOwnership = command(
 		const user = event.locals.user;
 
 		if (!user || user.role !== 'admin') {
-			return error(401, 'Unauthorized');
+			setFlash({ type: 'error', message: 'Unauthorized' }, event.cookies);
+			return false;
 		}
 
 		const newUser = await db.query.user.findFirst({
@@ -153,7 +167,7 @@ export const transferOwnership = command(
 
 		if (!newUser) {
 			setFlash({ type: 'error', message: 'User not found' }, event.cookies);
-			return error(400, 'User not found');
+			return false;
 		}
 
 		const provider = await db.query.account.findFirst({
@@ -165,7 +179,7 @@ export const transferOwnership = command(
 
 		if (!provider) {
 			setFlash({ type: 'error', message: 'User is not logged in through HCA' }, event.cookies);
-			return error(400, 'User is not logged in through HCA');
+			return false;
 		}
 
 		try {
@@ -180,7 +194,8 @@ export const transferOwnership = command(
 			return true;
 		} catch (err) {
 			console.error(err);
-			return error(500, 'Unknown error');
+			setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+			return false;
 		}
 	}
 );

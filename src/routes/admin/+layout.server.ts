@@ -27,7 +27,6 @@ export const load = (async ({ locals, request, cookies }) => {
 
 	const cookie = cookies.get(SIDEBAR_COOKIE_NAME);
 
-	// eslint-disable-next-line no-useless-assignment
 	let oauthClients: OAuthClient[] | null = [];
 
 	try {
@@ -37,9 +36,10 @@ export const load = (async ({ locals, request, cookies }) => {
 		oauthClients = result;
 	} catch (err) {
 		if (err instanceof APIError) {
-			return error(500, err.message);
+			if (err.statusCode !== 401) {
+				return error(err.statusCode, err.message.length > 0 ? err.message : err.status.toString());
+			}
 		}
-		throw err;
 	}
 
 	return {
