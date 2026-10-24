@@ -6,6 +6,7 @@ import { db } from '#lib/server/db';
 import * as schema from '#lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
+import type { OAuthMetadata } from './types/oauth-metadata';
 
 export const rotateClientSecret = command(z.string(), async (app) => {
 	const event = getRequestEvent();
@@ -191,6 +192,129 @@ export const transferOwnership = command(
 				.where(eq(schema.oauthClient.clientId, app));
 
 			setFlash({ type: 'success', message: 'Ownership transferred successfully' }, event.cookies);
+			return true;
+		} catch (err) {
+			console.error(err);
+			setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+			return false;
+		}
+	}
+);
+
+export const addCollaborator = command(
+	z.object({ app: z.string(), collaboratorEmail: z.email() }),
+	async ({ app, collaboratorEmail }) => {
+		const event = getRequestEvent();
+
+		const user = event.locals.user;
+
+		const oauthClient = await db.query.oauthClient.findFirst({
+			where: {
+				clientId: app
+			}
+		});
+
+		if (!oauthClient) {
+			setFlash(
+				{ type: 'error', message: 'Client not found or authorization missing' },
+				event.cookies
+			);
+			return false;
+		}
+
+		if (!user || (user.role !== 'admin' && user.id !== oauthClient.userId)) {
+			setFlash(
+				{ type: 'error', message: 'Client not found or authorization missing' },
+				event.cookies
+			);
+			return false;
+		}
+
+		const newUser = await db.query.user.findFirst({
+			where: {
+				email: collaboratorEmail
+			}
+		});
+
+		if (!newUser) {
+			setFlash({ type: 'error', message: 'User not found' }, event.cookies);
+			return false;
+		}
+
+		const provider = await db.query.account.findFirst({
+			where: {
+				userId: newUser.id,
+				providerId: 'hackclub'
+			}
+		});
+
+		if (!provider) {
+			setFlash({ type: 'error', message: 'User is not logged in through HCA' }, event.cookies);
+			return false;
+		}
+
+		try {
+			const metadata: OAuthMetadata = oauthClient.metadata || { collaborators: [] };
+			if (!metadata.collaborators?.includes(newUser.id)) {
+				metadata.collaborators?.push(newUser.id);
+			}
+
+			await db
+				.update(schema.oauthClient)
+				.set({ metadata })
+				.where(eq(schema.oauthClient.clientId, app));
+
+			setFlash({ type: 'success', message: 'Collaborator added successfully' }, event.cookies);
+			return true;
+		} catch (err) {
+			console.error(err);
+			setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+			return false;
+		}
+	}
+);
+
+export const removeCollaborator = command(
+	z.object({ app: z.string(), collaboratorId: z.string() }),
+	async ({ app, collaboratorId }) => {
+		const event = getRequestEvent();
+
+		const user = event.locals.user;
+
+		const oauthClient = await db.query.oauthClient.findFirst({
+			where: {
+				clientId: app
+			}
+		});
+
+		if (!oauthClient) {
+			setFlash(
+				{ type: 'error', message: 'Client not found or authorization missing' },
+				event.cookies
+			);
+			return false;
+		}
+
+		if (!user || (user.role !== 'admin' && user.id !== oauthClient.userId)) {
+			setFlash(
+				{ type: 'error', message: 'Client not found or authorization missing' },
+				event.cookies
+			);
+			return false;
+		}
+
+		try {
+			const metadata: OAuthMetadata = oauthClient.metadata || { collaborators: [] };
+			if (metadata.collaborators?.includes(collaboratorId)) {
+				metadata.collaborators = metadata.collaborators.filter((id) => id !== collaboratorId);
+			}
+
+			await db
+				.update(schema.oauthClient)
+				.set({ metadata })
+				.where(eq(schema.oauthClient.clientId, app));
+
+			setFlash({ type: 'success', message: 'Collaborator removed successfully' }, event.cookies);
 			return true;
 		} catch (err) {
 			console.error(err);

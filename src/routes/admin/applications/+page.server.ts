@@ -5,6 +5,9 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { auth } from '#lib/server/auth';
 import { APIError } from 'better-auth/api';
 import { getApps } from '../data.remote';
+import type { OAuthMetadata } from '#lib/types/oauth-metadata';
+import { resolve } from '$app/paths';
+import { redirect } from '@sveltejs/kit';
 
 export const load = (async () => {
 	return {
@@ -24,6 +27,10 @@ export const actions = {
 			});
 		}
 
+		const metadata: OAuthMetadata = {
+			collaborators: []
+		};
+
 		try {
 			const result = await auth.api.adminCreateOAuthClient({
 				headers: event.request.headers,
@@ -33,10 +40,17 @@ export const actions = {
 					logo_uri: form.data.logo,
 					scope: form.data.scopes,
 					redirect_uris: form.data.redirectUris,
-					skip_consent: form.data.skipConsent
+					skip_consent: form.data.skipConsent,
+					metadata
 				}
 			});
-			console.log(result);
+
+			return redirect(
+				303,
+				resolve('/admin/applications/[app]', {
+					app: result.client_id
+				})
+			);
 		} catch (err) {
 			if (err instanceof APIError) {
 				return setError(form, 'name', err.message);

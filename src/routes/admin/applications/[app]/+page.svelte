@@ -9,7 +9,9 @@
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import type { PageProps } from './$types';
 	import {
+		addCollaborator,
 		deleteApp,
+		removeCollaborator,
 		revokeAuthorization,
 		rotateClientSecret,
 		transferOwnership
@@ -23,7 +25,8 @@
 		resetClientSecretDialogOpen: false,
 		revokeAccessTokensDialogOpen: false,
 		deleteApplicationDialogOpen: false,
-		transferOwnershipDialogOpen: false
+		transferOwnershipDialogOpen: false,
+		addCollaboratorDialogOpen: false
 	});
 
 	let newClientSecret = $state<string | null>(null);
@@ -213,15 +216,49 @@
 									<span class="ml-2 text-sm font-medium">{data.app.user?.name.split(' ')[0]}</span>
 									<span class="text-muted-foreground">({data.app.user?.email})</span>
 								</span>
-								<!-- put the owner text at the end of the row -->
 								<span class="block">Owner</span>
 							</div>
 						</span>
+						{#each data.collaborators as collaborator (collaborator.id)}
+							<span class="flex flex-row items-center py-4">
+								<Avatar.Root class="size-6 rounded-lg">
+									<Avatar.Image
+										src={collaborator.image}
+										alt={collaborator.name?.charAt(0).toUpperCase()}
+									/>
+									<Avatar.Fallback>{collaborator.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
+								</Avatar.Root>
+								<div class="flex flex-1 items-center justify-between gap-2">
+									<span>
+										<span class="ml-2 text-sm font-medium">{collaborator.name.split(' ')[0]}</span>
+										<span class="text-muted-foreground">({collaborator.email})</span>
+									</span>
+									<span class="block">
+										<Button
+											variant="destructive"
+											size="sm"
+											onclick={async () => {
+												await removeCollaborator({
+													app: data.app?.clientId || '',
+													collaboratorId: collaborator.id
+												});
+												await refreshAll();
+											}}>Remove</Button
+										>
+									</span>
+								</div>
+							</span>
+						{/each}
 						<Separator class="my-2" />
 						<Button class="w-full" onclick={() => (dialogState.transferOwnershipDialogOpen = true)}
 							>Transfer Ownership</Button
 						>
-						<Button class="mt-2 w-full" disabled>Add Collaborator</Button>
+						<Button
+							class="mt-2 w-full"
+							onclick={() => (dialogState.addCollaboratorDialogOpen = true)}
+						>
+							Add Collaborator
+						</Button>
 					</Card.Content>
 				</Card.Root>
 			</div>
@@ -281,6 +318,28 @@
 			type="email"
 			class="my-2"
 			bind:value={newOwnerEmail}
+		/>
+	</ConfirmDialog>
+
+	{let newCollaboratorEmail = $state('')}
+	<ConfirmDialog
+		bind:open={dialogState.addCollaboratorDialogOpen}
+		title="Add Collaborator"
+		description="Enter the email of the new collaborator you want to add to this application."
+		onConfirm={async () => {
+			await addCollaborator({
+				app: data.app?.clientId || '',
+				collaboratorEmail: newCollaboratorEmail
+			});
+			await refreshAll();
+			dialogState.addCollaboratorDialogOpen = false;
+		}}
+	>
+		<Input
+			placeholder="Enter the email of the new owner"
+			type="email"
+			class="my-2"
+			bind:value={newCollaboratorEmail}
 		/>
 	</ConfirmDialog>
 {:else}
