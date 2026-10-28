@@ -9,6 +9,8 @@
 	import { page } from '$app/state';
 	import { getApp } from './data.remote';
 	import type { LayoutProps } from './$types';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { resolve } from '$app/paths';
 
 	let { data, children }: LayoutProps = $props();
 
@@ -27,71 +29,93 @@
 				})) || []
 		}
 	};
+
+	const getBreadcrumbHref = (segments: string[], end: number) =>
+		'/' +
+		segments
+			.slice(0, end)
+			.map((segment) => (segment === '[app]' ? page.params.app : segment))
+			.join('/');
 </script>
 
 <Sidebar.Provider oauthClients={data.oauthClients} user={data.user} open={data.sidebarOpen}>
 	<AppSidebar />
 	<Sidebar.Inset>
 		<header class="flex h-16 shrink-0 items-center gap-2">
-			<div class="flex items-center gap-2 px-4">
-				<Sidebar.Trigger class="-ms-1" />
-				<Separator orientation="vertical" class="me-2 data-vertical:h-4 data-vertical:self-auto" />
-				<Breadcrumb.Root>
-					{@const segments = page.route.id?.split('/').filter(Boolean) || ['admin']}
-					<Breadcrumb.List>
-						{#each segments as segment, index (index)}
-							{@const isLast = index === segments.length - 1}
-							<Breadcrumb.Item class="block">
-								{#if !isLast}
-									<Breadcrumb.Link href={'/' + segments.slice(0, index + 1).join('/')}>
-										{segment.slice(0, 1).toUpperCase() + segment.slice(1)}
-									</Breadcrumb.Link>
-								{:else}
-									{#if slugMap[segment as keyof typeof slugMap]}
-										{@const name = await slugMap[segment as keyof typeof slugMap].getPath()}
-										{#if slugMap[segment as keyof typeof slugMap].getList && (await slugMap[segment as keyof typeof slugMap].getList()).length > 1}
-											<DropdownMenu.Root>
-												<DropdownMenu.Trigger class="flex items-center gap-1">
-													{name}
-													<ChevronDownIcon data-icon="inline-end" class="size-3.5" />
-												</DropdownMenu.Trigger>
-												<DropdownMenu.Content align="start">
-													<DropdownMenu.Group>
-														{#each await slugMap[segment as keyof typeof slugMap].getList() as item (item.slug)}
-															<DropdownMenu.Item>
-																{#snippet child({ props })}
-																	<a
-																		href={'/' +
-																			segments.slice(0, index).join('/') +
-																			'/' +
-																			item.slug}
-																		{...props}
-																	>
-																		{item.name}
-																	</a>
-																{/snippet}
-															</DropdownMenu.Item>
-														{/each}
-													</DropdownMenu.Group>
-												</DropdownMenu.Content>
-											</DropdownMenu.Root>
+			<div class="flex flex-1 items-center justify-between gap-2 px-4">
+				<span class="flex items-center gap-2">
+					<Sidebar.Trigger class="-ms-1" />
+					<Separator
+						orientation="vertical"
+						class="me-2 data-vertical:h-4 data-vertical:self-auto"
+					/>
+					<Breadcrumb.Root>
+						{@const segments = page.route.id?.split('/').filter(Boolean) || ['admin']}
+						<Breadcrumb.List>
+							{#each segments as segment, index (index)}
+								{@const isLast = index === segments.length - 1}
+								<Breadcrumb.Item class="block">
+									{#if !isLast}
+										{#if slugMap[segment as keyof typeof slugMap]}
+											{@const name = await slugMap[segment as keyof typeof slugMap].getPath()}
+											<Breadcrumb.Link href={getBreadcrumbHref(segments, index + 1)}
+												>{name}</Breadcrumb.Link
+											>
 										{:else}
-											<Breadcrumb.Page>{name}</Breadcrumb.Page>
+											<Breadcrumb.Link href={getBreadcrumbHref(segments, index + 1)}
+												>{segment.slice(0, 1).toUpperCase() + segment.slice(1)}</Breadcrumb.Link
+											>
 										{/if}
 									{:else}
-										<Breadcrumb.Page
-											>{segment.slice(0, 1).toUpperCase() + segment.slice(1)}</Breadcrumb.Page
-										>
+										{#if slugMap[segment as keyof typeof slugMap]}
+											{@const name = await slugMap[segment as keyof typeof slugMap].getPath()}
+											{#if slugMap[segment as keyof typeof slugMap].getList && (await slugMap[segment as keyof typeof slugMap].getList()).length > 1}
+												<DropdownMenu.Root>
+													<DropdownMenu.Trigger class="flex items-center gap-1">
+														{name}
+														<ChevronDownIcon data-icon="inline-end" class="size-3.5" />
+													</DropdownMenu.Trigger>
+													<DropdownMenu.Content align="start">
+														<DropdownMenu.Group>
+															{#each await slugMap[segment as keyof typeof slugMap].getList() as item (item.slug)}
+																<DropdownMenu.Item>
+																	{#snippet child({ props })}
+																		<a
+																			href={'/' +
+																				segments.slice(0, index).join('/') +
+																				'/' +
+																				item.slug}
+																			{...props}
+																		>
+																			{item.name}
+																		</a>
+																	{/snippet}
+																</DropdownMenu.Item>
+															{/each}
+														</DropdownMenu.Group>
+													</DropdownMenu.Content>
+												</DropdownMenu.Root>
+											{:else}
+												<Breadcrumb.Page>{name}</Breadcrumb.Page>
+											{/if}
+										{:else}
+											<Breadcrumb.Page
+												>{segment.slice(0, 1).toUpperCase() + segment.slice(1)}</Breadcrumb.Page
+											>
+										{/if}
 									{/if}
-								{/if}
-							</Breadcrumb.Item>
+								</Breadcrumb.Item>
 
-							{#if !isLast}
-								<Breadcrumb.Separator class="block" />
-							{/if}
-						{/each}
-					</Breadcrumb.List>
-				</Breadcrumb.Root>
+								{#if !isLast}
+									<Breadcrumb.Separator class="block" />
+								{/if}
+							{/each}
+						</Breadcrumb.List>
+					</Breadcrumb.Root>
+				</span>
+				<span>
+					<Button href={resolve('/user')}>Back to User</Button>
+				</span>
 			</div>
 		</header>
 		<div class="flex flex-1 flex-col gap-4 p-4 pt-0">

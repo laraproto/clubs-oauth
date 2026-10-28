@@ -18,6 +18,7 @@
 	} from '#lib/oauth.remote';
 	import ConfirmDialog from '#lib/components/confirm-dialog.svelte';
 	import { refreshAll } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
 
@@ -37,7 +38,7 @@
 {#if data.app}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-			<div class="flex flex-col gap-4 lg:col-span-1 lg:row-span-2 lg:gap-8">
+			<div class="flex flex-col gap-4 lg:col-span-1 lg:row-span-2">
 				<Card.Root class="relative mx-auto w-full  pt-0">
 					<div class="absolute inset-0 z-15 aspect-video bg-black/35"></div>
 					<img
@@ -71,7 +72,10 @@
 					</Card.Footer>
 				</Card.Root>
 				<span class="flex justify-center">
-					<Button class="w-full">Edit App</Button>
+					<Button
+						href={resolve('/admin/applications/[app]/edit', { app: data.app?.clientId })}
+						class="w-full">Edit App</Button
+					>
 				</span>
 			</div>
 			<div class="lg:col-span-2">
@@ -177,7 +181,7 @@
 				</Card.Root>
 			</div>
 			<div class="lg:col-span-1">
-				<Card.Root class="h-full border border-destructive bg-destructive/20">
+				<Card.Root class="h-full max-h-fit border border-destructive bg-destructive/20">
 					<Card.Header>
 						<Card.Title>Danger Zone</Card.Title>
 					</Card.Header>
@@ -200,7 +204,7 @@
 			<div class="lg:col-span-2">
 				<Card.Root class="h-full">
 					<Card.Header>
-						<Card.Title>Collaborators (in the near future)</Card.Title>
+						<Card.Title>Collaborators</Card.Title>
 					</Card.Header>
 					<Card.Content>
 						<span class="flex flex-row items-center py-4">
