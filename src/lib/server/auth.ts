@@ -8,8 +8,14 @@ import {
 } from '$app/env/private';
 import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2';
-import { jwt, admin, genericOAuth, emailOTP /*, multiSession*/ } from 'better-auth/plugins';
-import { oauthProvider } from '@better-auth/oauth-provider';
+import {
+	jwt,
+	admin,
+	genericOAuth,
+	emailOTP,
+	organization /*, multiSession*/
+} from 'better-auth/plugins';
+import { oauthProvider, type OAuthOptions } from '@better-auth/oauth-provider';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { getRequestEvent } from '$app/server';
 import { db } from '#lib/server/db';
@@ -18,7 +24,31 @@ import { APIError, createAuthMiddleware } from 'better-auth/api';
 import clubApi from '#lib/server/clubs';
 import transporter from '#lib/server/mail';
 import render from '../emails';
-import { collaboratorDisallowedActions, type OAuthMetadata } from '#lib/types/oauth-metadata';
+
+const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
+	action,
+	headers,
+	session,
+	user,
+	clientId
+}) => {
+	if (user && user.role === 'admin') {
+		return true;
+	}
+	if (action === 'list') {
+		return true;
+	}
+
+	if (!clientId) {
+		return false;
+	}
+
+	if (!session?.activeOrganizationId) return false;
+	const member: Awaited<
+		ReturnType<ReturnType<typeof organization>['endpoints']['getActiveMember']>
+	> = await auth.api.getActiveMember({ headers });
+	return member?.role === 'owner';
+};
 
 export const auth = betterAuth({
 	baseURL: {
@@ -40,7 +70,10 @@ export const auth = betterAuth({
 			]
 		}),
 		admin(),
-		jwt(),
+		organization({
+			allowUserToCreateOrganization: false
+		}),
+		jwt({ disableSettingJwtHeader: true }),
 		emailOTP({
 			overrideDefaultEmailVerification: false,
 			sendVerificationOTP: async ({ email, otp, type }) => {
@@ -60,43 +93,9 @@ export const auth = betterAuth({
 			loginPage: '/auth/signin',
 			consentPage: '/auth/consent',
 			allowPublicClientPrelogin: true,
-			clientPrivileges: async (ctx) => {
-				if (ctx.user && ctx.user.role === 'admin') {
-					//return true;
-				}
-				if (ctx.action === 'list') {
-					return true;
-				}
-
-				if (!ctx.clientId) {
-					return false;
-				}
-
-				const oauthClient = await db.query.oauthClient.findFirst({
-					where: {
-						clientId: ctx.clientId
-					}
-				});
-
-				if (!oauthClient) {
-					return false;
-				}
-
-				if (oauthClient.userId === ctx.user?.id) {
-					return true;
-				}
-
-				const metadata = oauthClient.metadata as OAuthMetadata;
-
-				console.log('oauthClient metadata:', metadata);
-
-				if (
-					metadata?.collaborators?.includes(ctx.user?.email || '') &&
-					!collaboratorDisallowedActions.includes(ctx.action)
-				) {
-					return true;
-				}
-			}
+			clientReference: ({ session }) =>
+				(session?.activeOrganizationId as string | undefined) ?? undefined,
+			clientPrivileges
 		}),
 		/*multiSession({
 			maximumSessions: 3
