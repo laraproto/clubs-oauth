@@ -1,42 +1,22 @@
-# sv
+# Clubs OAuth
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Wrapper around hack club clubs api (would've been better if I could have just used airtable), this project's purpose is to make it significantly easier to add club member sign in to projects because let's be real just about everything supports oauth2 and oidc
 
-## Creating a project
+## Features required
+- [ ] Improve the chaos known as auth, particularly with hca
+- [ ] Add the club_name and club_role claims to the oauth server
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Development
 
-```sh
-# create a new project
-npx sv create my-app
-```
+I may have been a bit too lazy to make a mock api, this project can only really be worked on if you have a clubs api key, I may make one so that ysws reviewers can check it
 
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-bun x sv@0.17.1 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" sveltekit-adapter="adapter:node" drizzle="database:postgresql+postgresql:postgres.js+docker:yes" better-auth="demo:password" experimental="versions:kit+features:async,remoteFunctions,explicitEnvironmentVariables,handleRenderingErrors" --install bun clubs-oauth
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+If you have what's required you just need to set up .env (copied from .env.example), sveltekit will tell you if something's missing, then running it is just
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+bun i
+bun run dev
 ```
 
-## Building
+## Production
 
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This is honestly not far off of being production ready but that's just because the oauth server is really the only complex part here
