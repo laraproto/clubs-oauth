@@ -47,9 +47,11 @@ export const processRequest = command(
 
 			let organizationId = request.organizationId;
 			if (request.createOrg && request.organizationName) {
+				console.log('Creating organization for request', request.id);
 				const newOrg = await auth.api.createOrganization({
 					body: {
 						name: request.organizationName,
+						userId: request.userId,
 						slug: crypto.randomUUID()
 					}
 				});
@@ -59,6 +61,7 @@ export const processRequest = command(
 			const originalOrganizationId =
 				(event.locals.session?.activeOrganizationId as string | undefined) ?? undefined;
 
+			console.log('Setting active organization to', organizationId);
 			await auth.api.setActiveOrganization({
 				body: {
 					organizationId
@@ -66,6 +69,7 @@ export const processRequest = command(
 				headers: event.request.headers
 			});
 
+			console.log('Creating OAuth client for request', request.id);
 			await auth.api.adminCreateOAuthClient({
 				body: {
 					client_name: request.name,
@@ -77,12 +81,21 @@ export const processRequest = command(
 				headers: event.request.headers
 			});
 
+			console.log('Restoring original active organization to', originalOrganizationId);
 			await auth.api.setActiveOrganization({
 				body: {
 					organizationId: originalOrganizationId ?? null
 				},
 				headers: event.request.headers
 			});
+
+			await db
+				.update(schema.applicationRequests)
+				.set({
+					status: 'accepted',
+					process_reason: app.reason ?? null
+				})
+				.where(eq(schema.applicationRequests.id, app.id));
 
 			setFlash(
 				{

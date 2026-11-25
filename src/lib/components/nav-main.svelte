@@ -5,7 +5,6 @@
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import type { Component } from 'svelte';
 	import type { ResolvedPathname } from '$app/types';
-	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
 	let {
@@ -30,18 +29,14 @@
 			<Sidebar.MenuItem class="flex items-center gap-2">
 				<Sidebar.MenuButton
 					class="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-					tooltipContent="Create Application"
-					onclick={() => {
-						goto(resolve('/developer/applications'), {
-							state: {
-								modal: true
-							},
-							shallow: false
-						});
-					}}
+					tooltipContent="Create Application Request"
 				>
-					<CirclePlusIcon />
-					<span>Submit Request</span>
+					{#snippet child({ props })}
+						<a href={resolve('/developer/applications/request')} {...props}>
+							<CirclePlusIcon />
+							<span>Submit Request</span>
+						</a>
+					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 			{#each items as mainItem (mainItem.title)}

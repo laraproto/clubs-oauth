@@ -22,10 +22,11 @@
 		Authorize {data.oauthClient?.client_name} to access your account?
 	</p>
 	<span class="flex flex-row gap-2 pt-6">
-		<Button variant="outline" size="sm" onclick={() => authConsent({ consent: false })}>Deny</Button
-		>
-		<Button variant="default" size="sm" onclick={() => authConsent({ consent: true })}
-			>Authorize</Button
-		>
+		<Button variant="outline" size="sm" onclick={() => authConsent({ consent: false })}>
+			Deny
+		</Button>
+		<Button variant="default" size="sm" onclick={() => authConsent({ consent: true })}>
+			Authorize
+		</Button>
 	</span>
 </div>

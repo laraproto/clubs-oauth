@@ -36,9 +36,9 @@ export const applicationRequestSelectMinimalSchema = createSelectSchema(applicat
 
 export const applicationRequestSelectSchema = z.object({
 	...applicationRequestSelectMinimalSchema.shape,
-	user: userSelectSchema,
+	user: userSelectSchema.nullable(),
 	reviewer: userSelectSchema.nullable(),
-	organization: organizationSelectSchema.optional()
+	organization: organizationSelectSchema.nullable()
 });
 
 export type ApplicationRequestSelectSchema = z.infer<typeof applicationRequestSelectSchema>;

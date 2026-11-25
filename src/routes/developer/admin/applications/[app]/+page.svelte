@@ -3,19 +3,10 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import * as Avatar from '#lib/components/ui/avatar/index.js';
-	import { Separator } from '#lib/components/ui/separator/index.js';
-	import { Input } from '#lib/components/ui/input/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import type { PageProps } from './$types';
-	import {
-		addCollaborator,
-		deleteApp,
-		removeCollaborator,
-		revokeAuthorization,
-		rotateClientSecret,
-		transferOwnership
-	} from '#lib/oauth.remote';
+	import { deleteApp, revokeAuthorization, rotateClientSecret } from '#lib/oauth.remote';
 	import ConfirmDialog from '#lib/components/confirm-dialog.svelte';
 	import { refreshAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -25,9 +16,7 @@
 	let dialogState = $state({
 		resetClientSecretDialogOpen: false,
 		revokeAccessTokensDialogOpen: false,
-		deleteApplicationDialogOpen: false,
-		transferOwnershipDialogOpen: false,
-		addCollaboratorDialogOpen: false
+		deleteApplicationDialogOpen: false
 	});
 
 	let newClientSecret = $state<string | null>(null);
@@ -62,12 +51,14 @@
 						<span class="flex flex-row items-center">
 							<Avatar.Root class="size-6 rounded-lg">
 								<Avatar.Image
-									src={data.app.user?.image}
-									alt={data.app.user?.name?.charAt(0).toUpperCase()}
+									src={data.app.organization?.logo}
+									alt={data.app.organization?.name?.charAt(0).toUpperCase()}
 								/>
-								<Avatar.Fallback>{data.app.user?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
+								<Avatar.Fallback>
+									{data.app.organization?.name?.charAt(0).toUpperCase()}
+								</Avatar.Fallback>
 							</Avatar.Root>
-							<span class="ml-2 text-sm font-medium">{data.app.user?.name.split(' ')[0]}</span>
+							<span class="ml-2 text-sm font-medium">{data.app.organization?.name}</span>
 						</span>
 					</Card.Footer>
 				</Card.Root>
@@ -206,73 +197,6 @@
 					</Card.Content>
 				</Card.Root>
 			</div>
-			<div class="lg:col-span-2">
-				<Card.Root class="h-full">
-					<Card.Header>
-						<Card.Title>Collaborators</Card.Title>
-					</Card.Header>
-					<Card.Content>
-						<span class="flex flex-row items-center py-4">
-							<Avatar.Root class="size-6 rounded-lg">
-								<Avatar.Image
-									src={data.app.user?.image}
-									alt={data.app.user?.name?.charAt(0).toUpperCase()}
-								/>
-								<Avatar.Fallback>{data.app.user?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
-							</Avatar.Root>
-							<div class="flex flex-1 items-center justify-between gap-2">
-								<span>
-									<span class="ml-2 text-sm font-medium">{data.app.user?.name.split(' ')[0]}</span>
-									<span class="text-muted-foreground">({data.app.user?.email})</span>
-								</span>
-								<span class="block">Owner</span>
-							</div>
-						</span>
-						{#each data.collaborators as collaborator (collaborator.id)}
-							<span class="flex flex-row items-center py-4">
-								<Avatar.Root class="size-6 rounded-lg">
-									<Avatar.Image
-										src={collaborator.image}
-										alt={collaborator.name?.charAt(0).toUpperCase()}
-									/>
-									<Avatar.Fallback>{collaborator.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
-								</Avatar.Root>
-								<div class="flex flex-1 items-center justify-between gap-2">
-									<span>
-										<span class="ml-2 text-sm font-medium">{collaborator.name.split(' ')[0]}</span>
-										<span class="text-muted-foreground">({collaborator.email})</span>
-									</span>
-									<span class="block">
-										<Button
-											variant="destructive"
-											size="sm"
-											onclick={async () => {
-												await removeCollaborator({
-													app: data.app?.clientId || '',
-													collaboratorId: collaborator.id
-												});
-												await refreshAll();
-											}}
-										>
-											Remove
-										</Button>
-									</span>
-								</div>
-							</span>
-						{/each}
-						<Separator class="my-2" />
-						<Button class="w-full" onclick={() => (dialogState.transferOwnershipDialogOpen = true)}>
-							Transfer Ownership
-						</Button>
-						<Button
-							class="mt-2 w-full"
-							onclick={() => (dialogState.addCollaboratorDialogOpen = true)}
-						>
-							Add Collaborator
-						</Button>
-					</Card.Content>
-				</Card.Root>
-			</div>
 		</div>
 	</div>
 
@@ -312,47 +236,6 @@
 			dialogState.deleteApplicationDialogOpen = false;
 		}}
 	/>
-
-	{let newOwnerEmail = $state('')}
-	<ConfirmDialog
-		bind:open={dialogState.transferOwnershipDialogOpen}
-		title="Transfer Ownership"
-		description="Are you sure you want to transfer ownership of this application? Please make sure to get confirmation beforehand from the Clubs team"
-		onConfirm={async () => {
-			await transferOwnership({ app: data.app?.clientId || '', newOwnerEmail });
-			await refreshAll();
-			dialogState.transferOwnershipDialogOpen = false;
-		}}
-	>
-		<Input
-			placeholder="Enter the email of the new owner"
-			type="email"
-			class="my-2"
-			bind:value={newOwnerEmail}
-		/>
-	</ConfirmDialog>
-
-	{let newCollaboratorEmail = $state('')}
-	<ConfirmDialog
-		bind:open={dialogState.addCollaboratorDialogOpen}
-		title="Add Collaborator"
-		description="Enter the email of the new collaborator you want to add to this application."
-		onConfirm={async () => {
-			await addCollaborator({
-				app: data.app?.clientId || '',
-				collaboratorEmail: newCollaboratorEmail
-			});
-			await refreshAll();
-			dialogState.addCollaboratorDialogOpen = false;
-		}}
-	>
-		<Input
-			placeholder="Enter the email of the new owner"
-			type="email"
-			class="my-2"
-			bind:value={newCollaboratorEmail}
-		/>
-	</ConfirmDialog>
 {:else}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<Card.Root class="mx-auto w-full max-w-sm">

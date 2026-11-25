@@ -7,8 +7,6 @@
 	import { signout } from '#lib/auth.remote';
 	import { goto } from '$app/navigation';
 
-	let { admin }: { admin: boolean } = $props();
-
 	let logoutConfirmDialog = $state(false);
 </script>
 
@@ -27,9 +25,7 @@
 			>
 				Logout
 			</Button>
-			{#if admin}
-				<Button href={resolve('/developer/dashboard')}>Developer</Button>
-			{/if}
+			<Button href={resolve('/developer/dashboard')}>Developer</Button>
 		</div>
 	</div>
 </header>

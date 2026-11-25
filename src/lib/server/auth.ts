@@ -57,7 +57,8 @@ const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
 
 export const auth = betterAuth({
 	baseURL: {
-		allowedHosts: [new URL(ORIGIN ?? 'http://localhost:5173').host]
+		allowedHosts: [new URL(ORIGIN ?? 'http://localhost:5173').host],
+		fallback: ORIGIN ?? 'http://localhost:5173'
 	},
 	secret: APP_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg', schema }),

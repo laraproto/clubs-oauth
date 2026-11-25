@@ -29,12 +29,14 @@
 				{@render children()}
 			</div>
 		</div>
-		<span class="ml-auto hidden lg:block"
-			>Photo taken at <a
+		<span class="ml-auto hidden lg:block">
+			Photo taken at <a
 				class="text-primary underline transition-all hover:opacity-80"
-				href="https://midnight.hackclub.com">Midnight 2026</a
-			></span
-		>
+				href="https://midnight.hackclub.com"
+			>
+				Midnight 2026
+			</a>
+		</span>
 	</div>
 	<div class="relative hidden bg-muted lg:block">
 		<img

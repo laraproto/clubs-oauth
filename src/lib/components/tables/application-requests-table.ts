@@ -11,8 +11,8 @@ export const columns = columnHelper.columns([
 	columnHelper.accessor('user.email', {
 		header: 'Email'
 	}),
-	columnHelper.accessor((row) => row.user.name, {
-		header: 'Name'
+	columnHelper.accessor('name', {
+		header: 'Application Name'
 	}),
 	columnHelper.accessor('reason', {
 		cell: ({ row }) => {

@@ -17,7 +17,8 @@ export const createRequestSchema = z
 				}
 			),
 		organizationName: z.string().optional(),
-		organizationId: z.string().default('create')
+		organizationId: z.string().default('create'),
+		reason: z.string().min(10, 'Reason must be at least 10 characters long.')
 	})
 	.refine(
 		(data) =>

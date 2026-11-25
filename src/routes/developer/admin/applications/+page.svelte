@@ -36,10 +36,13 @@
 			<Card.Footer>
 				<span class="flex flex-row items-center">
 					<Avatar.Root class="size-6 rounded-lg">
-						<Avatar.Image src={app.user?.image} alt={app.user?.name?.charAt(0).toUpperCase()} />
-						<Avatar.Fallback>{app.user?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
+						<Avatar.Image
+							src={app.organization?.logo}
+							alt={app.organization?.name?.charAt(0).toUpperCase()}
+						/>
+						<Avatar.Fallback>{app.organization?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
 					</Avatar.Root>
-					<span class="ml-2 text-sm font-medium">{app.user?.name.split(' ')[0]}</span>
+					<span class="ml-2 text-sm font-medium">{app.organization?.name}</span>
 				</span>
 				<span class="ml-auto text-sm font-medium text-muted-foreground">
 					<Button

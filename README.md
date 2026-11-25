@@ -3,6 +3,7 @@
 Wrapper around hack club clubs api (would've been better if I could have just used airtable), this project's purpose is to make it significantly easier to add club member sign in to projects because let's be real just about everything supports oauth2 and oidc
 
 ## Features required
+
 - [ ] Improve the chaos known as auth, particularly with hca
 - [ ] Add the club_name and club_role claims to the oauth server
 

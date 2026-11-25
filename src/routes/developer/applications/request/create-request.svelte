@@ -1,16 +1,14 @@
 <script lang="ts">
-	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
 	import * as Select from '#lib/components/ui/select/index.js';
+	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
-	import { buttonVariants } from '#lib/components/ui/button/index.js';
-	import { page } from '$app/state';
 	import { createRequestSchema, type CreateRequestSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { untrack } from 'svelte';
-	import { getOrganizations } from './data.remote';
+	import { getOrganizations } from '../data.remote';
 
 	let {
 		form: initialForm
@@ -40,18 +38,13 @@
 	const { form: formData, enhance } = form;
 </script>
 
-<Dialog.Root
-	open={page.state?.modal}
-	onOpenChangeComplete={(open) => {
-		if (!open) history.back();
-	}}
->
-	<Dialog.Content class="sm:max-w-md">
+<div class="flex flex-1 flex-col gap-4">
+	<Card.Root class="container w-full flex-1 flex-col">
 		<form method="POST" use:enhance>
-			<Dialog.Header class="pb-6">
-				<Dialog.Title>New Application Request</Dialog.Title>
-			</Dialog.Header>
-			<div class="flex items-center gap-2">
+			<Card.Header class="pb-6">
+				<Card.Title>New Application Request</Card.Title>
+			</Card.Header>
+			<Card.Content>
 				<div class="grid flex-1 gap-2">
 					<Form.Field {form} name="organizationId">
 						<Form.Control>
@@ -88,6 +81,19 @@
 							<Form.FieldErrors />
 						</Form.Field>
 					{/if}
+					<Form.Field {form} name="reason">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Reason</Form.Label>
+								<Textarea {...props} class="wrap-break-word" bind:value={$formData.reason} />
+							{/snippet}
+						</Form.Control>
+						<Form.Description>
+							Reason for requesting an application. Club data is more controlled and a reason is
+							required to ensure legitimate use
+						</Form.Description>
+						<Form.FieldErrors />
+					</Form.Field>
 					<Form.Field {form} name="name">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -150,11 +156,10 @@
 						<Form.FieldErrors />
 					</Form.Field>
 				</div>
-			</div>
-			<Dialog.Footer class="sm:justify-end">
-				<Dialog.Close type="reset" class={buttonVariants()}>Close</Dialog.Close>
+			</Card.Content>
+			<Card.Footer class="sm:justify-end">
 				<Form.Button>Submit</Form.Button>
-			</Dialog.Footer>
+			</Card.Footer>
 		</form>
-	</Dialog.Content>
-</Dialog.Root>
+	</Card.Root>
+</div>
