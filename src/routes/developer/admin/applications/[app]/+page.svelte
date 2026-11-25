@@ -50,11 +50,11 @@
 						<Card.Title class="flex flex-row items-center">
 							{data.app.name}
 							{#if data.app.uri}
-								<a href={data.app.uri} rel="external noopener noreferrer" target="_blank"
-									><LinkIcon
+								<a href={data.app.uri} rel="external noopener noreferrer" target="_blank">
+									<LinkIcon
 										class="ml-2 size-4 text-muted-foreground hover:cursor-pointer hover:text-primary"
-									/></a
-								>
+									/>
+								</a>
 							{/if}
 						</Card.Title>
 					</Card.Header>
@@ -73,9 +73,11 @@
 				</Card.Root>
 				<span class="flex justify-center">
 					<Button
-						href={resolve('/developer/applications/[app]/edit', { app: data.app?.clientId })}
-						class="w-full">Edit App</Button
+						href={resolve('/developer/admin/applications/[app]/edit', { app: data.app?.clientId })}
+						class="w-full"
 					>
+						Edit App
+					</Button>
 				</span>
 			</div>
 			<div class="lg:col-span-2">
@@ -138,8 +140,9 @@
 								<Button
 									class="max-w-fit"
 									onclick={() => (dialogState.resetClientSecretDialogOpen = true)}
-									>Regenerate Client Secret</Button
 								>
+									Regenerate Client Secret
+								</Button>
 							{/if}
 						</span>
 					</Card.Content>
@@ -190,14 +193,16 @@
 							variant="destructive"
 							class="w-full"
 							onclick={() => (dialogState.revokeAccessTokensDialogOpen = true)}
-							>Revoke Access Tokens</Button
 						>
+							Revoke Access Tokens
+						</Button>
 						<Button
 							variant="destructive"
 							class="mt-2 w-full"
 							onclick={() => (dialogState.deleteApplicationDialogOpen = true)}
-							>Delete Application</Button
 						>
+							Delete Application
+						</Button>
 					</Card.Content>
 				</Card.Root>
 			</div>
@@ -247,16 +252,18 @@
 													collaboratorId: collaborator.id
 												});
 												await refreshAll();
-											}}>Remove</Button
+											}}
 										>
+											Remove
+										</Button>
 									</span>
 								</div>
 							</span>
 						{/each}
 						<Separator class="my-2" />
-						<Button class="w-full" onclick={() => (dialogState.transferOwnershipDialogOpen = true)}
-							>Transfer Ownership</Button
-						>
+						<Button class="w-full" onclick={() => (dialogState.transferOwnershipDialogOpen = true)}>
+							Transfer Ownership
+						</Button>
 						<Button
 							class="mt-2 w-full"
 							onclick={() => (dialogState.addCollaboratorDialogOpen = true)}

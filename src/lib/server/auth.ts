@@ -35,6 +35,11 @@ const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
 	if (user && user.role === 'admin') {
 		return true;
 	}
+
+	if (action === 'create') {
+		return false;
+	}
+
 	if (action === 'list') {
 		return true;
 	}
@@ -47,7 +52,7 @@ const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
 	const member: Awaited<
 		ReturnType<ReturnType<typeof organization>['endpoints']['getActiveMember']>
 	> = await auth.api.getActiveMember({ headers });
-	return member?.role === 'owner';
+	return member?.role === 'admin' || member?.role === 'owner';
 };
 
 export const auth = betterAuth({
@@ -65,7 +70,7 @@ export const auth = betterAuth({
 					clientSecret: OAUTH_CLIENT_SECRET,
 					discoveryUrl: 'https://auth.hackclub.com/.well-known/openid-configuration',
 					scopes: ['openid', 'profile', 'email', 'slack_id'],
-					overrideUserInfo: true
+					overrideUserInfo: false
 				}
 			]
 		}),
@@ -153,7 +158,7 @@ export const auth = betterAuth({
 					});
 
 					if (!fetchUserInfoResponse.ok) {
-						console.error('Failed to fetch user info from Hack Club OAuth provider.');
+						console.error('Failed to fetch user info from HCA.');
 						break;
 					}
 
@@ -164,7 +169,7 @@ export const auth = betterAuth({
 					);
 
 					if (!slackInfoResponse.ok) {
-						console.error('Failed to fetch user info from Hack Club Cachet API.');
+						console.error('Failed to fetch slack info from Cachet.');
 						break;
 					}
 
@@ -177,6 +182,50 @@ export const auth = betterAuth({
 						slackId: userInfo.slack_id,
 						image: slackInfo.imageUrl
 					});
+
+					const [memberClubOk, memberClubError, memberClub] = await clubApi.get('/member/email', {
+						queryParams: {
+							email: ctx.context.newSession.user.email
+						}
+					});
+
+					const [leaderClubOk, leaderClubError, leaderClub] = await clubApi.get('/leader', {
+						queryParams: {
+							email: ctx.context.newSession.user.email
+						}
+					});
+
+					if (!memberClubOk || !leaderClubOk) {
+						console.error(memberClubError || leaderClubError);
+						break;
+					}
+
+					// shitty ai code
+					const clubName =
+						(memberClub.club_name && memberClub.club_name.length > 0
+							? memberClub.club_name
+							: null) ||
+						(typeof leaderClub === 'object' &&
+						leaderClub !== null &&
+						'club_name' in leaderClub &&
+						leaderClub.club_name!.length > 0
+							? leaderClub.club_name
+							: null);
+
+					const clubRole =
+						memberClub && memberClub.club_name && memberClub.club_name.length > 0
+							? 'member'
+							: 'leader';
+
+					if (ctx.context.newSession?.user.id && ctx.context.session?.user.id) {
+						await ctx.context.internalAdapter.updateUser(
+							ctx.context.newSession?.user.id || ctx.context.session?.user.id,
+							{
+								clubName,
+								clubRole
+							}
+						);
+					}
 
 					break;
 				}

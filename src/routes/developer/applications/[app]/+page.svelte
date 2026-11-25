@@ -2,20 +2,10 @@
 	import Head from '#lib/components/head.svelte';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
-	import * as Avatar from '#lib/components/ui/avatar/index.js';
-	import { Separator } from '#lib/components/ui/separator/index.js';
-	import { Input } from '#lib/components/ui/input/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import type { PageProps } from './$types';
-	import {
-		addCollaborator,
-		deleteApp,
-		removeCollaborator,
-		revokeAuthorization,
-		rotateClientSecret,
-		transferOwnership
-	} from '#lib/oauth.remote';
+	import { deleteApp, revokeAuthorization, rotateClientSecret } from '#lib/oauth.remote';
 	import ConfirmDialog from '#lib/components/confirm-dialog.svelte';
 	import { refreshAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -25,15 +15,13 @@
 	let dialogState = $state({
 		resetClientSecretDialogOpen: false,
 		revokeAccessTokensDialogOpen: false,
-		deleteApplicationDialogOpen: false,
-		transferOwnershipDialogOpen: false,
-		addCollaboratorDialogOpen: false
+		deleteApplicationDialogOpen: false
 	});
 
 	let newClientSecret = $state<string | null>(null);
 </script>
 
-<Head title={`Admin Application: ${data.app?.name || 'Not Found'}`} />
+<Head title={`Application: ${data.app?.client_name || 'Not Found'}`} />
 
 {#if data.app}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
@@ -42,40 +30,30 @@
 				<Card.Root class="relative mx-auto w-full  pt-0">
 					<div class="absolute inset-0 z-15 aspect-video bg-black/35"></div>
 					<img
-						src={data.app.icon || 'https://placehold.co/600x400?text=No+Image'}
-						alt={data.app.name}
+						src={data.app.logo_uri || 'https://placehold.co/600x400?text=No+Image'}
+						alt={data.app.client_name}
 						class="relative z-20 aspect-video w-full object-cover"
 					/>
 					<Card.Header>
 						<Card.Title class="flex flex-row items-center">
-							{data.app.name}
-							{#if data.app.uri}
-								<a href={data.app.uri} rel="external noopener noreferrer" target="_blank"
-									><LinkIcon
+							{data.app.client_name}
+							{#if data.app.client_uri}
+								<a href={data.app.client_uri} rel="external noopener noreferrer" target="_blank">
+									<LinkIcon
 										class="ml-2 size-4 text-muted-foreground hover:cursor-pointer hover:text-primary"
-									/></a
-								>
+									/>
+								</a>
 							{/if}
 						</Card.Title>
 					</Card.Header>
-					<Card.Footer>
-						<span class="flex flex-row items-center">
-							<Avatar.Root class="size-6 rounded-lg">
-								<Avatar.Image
-									src={data.app.user?.image}
-									alt={data.app.user?.name?.charAt(0).toUpperCase()}
-								/>
-								<Avatar.Fallback>{data.app.user?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
-							</Avatar.Root>
-							<span class="ml-2 text-sm font-medium">{data.app.user?.name.split(' ')[0]}</span>
-						</span>
-					</Card.Footer>
 				</Card.Root>
 				<span class="flex justify-center">
 					<Button
-						href={resolve('/developer/applications/[app]/edit', { app: data.app?.clientId })}
-						class="w-full">Edit App</Button
+						href={resolve('/developer/applications/[app]/edit', { app: data.app?.client_id })}
+						class="w-full"
 					>
+						Edit App
+					</Button>
 				</span>
 			</div>
 			<div class="lg:col-span-2">
@@ -93,12 +71,12 @@
 							>
 								<Tooltip.Trigger
 									onclick={() => {
-										navigator.clipboard.writeText(data.app?.clientId || '');
+										navigator.clipboard.writeText(data.app?.client_id || '');
 										copied = true;
 									}}
 									class="max-w-fit rounded-md bg-muted p-2"
 								>
-									<code>{data.app?.clientId}</code>
+									<code>{data.app?.client_id}</code>
 								</Tooltip.Trigger>
 								<Tooltip.Content>
 									{#if copied}
@@ -138,8 +116,9 @@
 								<Button
 									class="max-w-fit"
 									onclick={() => (dialogState.resetClientSecretDialogOpen = true)}
-									>Regenerate Client Secret</Button
 								>
+									Regenerate Client Secret
+								</Button>
 							{/if}
 						</span>
 					</Card.Content>
@@ -151,7 +130,7 @@
 						<Card.Title>Redirect URIs</Card.Title>
 					</Card.Header>
 					<Card.Content>
-						{#each data.app.redirectUris as redirectUri (redirectUri)}
+						{#each data.app.redirect_uris as redirectUri (redirectUri)}
 							<div class="flex flex-row items-center justify-between gap-2 rounded-md bg-muted p-2">
 								{let copied = $state(false)}
 								<Tooltip.Root
@@ -190,78 +169,15 @@
 							variant="destructive"
 							class="w-full"
 							onclick={() => (dialogState.revokeAccessTokensDialogOpen = true)}
-							>Revoke Access Tokens</Button
 						>
+							Revoke Access Tokens
+						</Button>
 						<Button
 							variant="destructive"
 							class="mt-2 w-full"
 							onclick={() => (dialogState.deleteApplicationDialogOpen = true)}
-							>Delete Application</Button
 						>
-					</Card.Content>
-				</Card.Root>
-			</div>
-			<div class="lg:col-span-2">
-				<Card.Root class="h-full">
-					<Card.Header>
-						<Card.Title>Collaborators</Card.Title>
-					</Card.Header>
-					<Card.Content>
-						<span class="flex flex-row items-center py-4">
-							<Avatar.Root class="size-6 rounded-lg">
-								<Avatar.Image
-									src={data.app.user?.image}
-									alt={data.app.user?.name?.charAt(0).toUpperCase()}
-								/>
-								<Avatar.Fallback>{data.app.user?.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
-							</Avatar.Root>
-							<div class="flex flex-1 items-center justify-between gap-2">
-								<span>
-									<span class="ml-2 text-sm font-medium">{data.app.user?.name.split(' ')[0]}</span>
-									<span class="text-muted-foreground">({data.app.user?.email})</span>
-								</span>
-								<span class="block">Owner</span>
-							</div>
-						</span>
-						{#each data.collaborators as collaborator (collaborator.id)}
-							<span class="flex flex-row items-center py-4">
-								<Avatar.Root class="size-6 rounded-lg">
-									<Avatar.Image
-										src={collaborator.image}
-										alt={collaborator.name?.charAt(0).toUpperCase()}
-									/>
-									<Avatar.Fallback>{collaborator.name?.charAt(0).toUpperCase()}</Avatar.Fallback>
-								</Avatar.Root>
-								<div class="flex flex-1 items-center justify-between gap-2">
-									<span>
-										<span class="ml-2 text-sm font-medium">{collaborator.name.split(' ')[0]}</span>
-										<span class="text-muted-foreground">({collaborator.email})</span>
-									</span>
-									<span class="block">
-										<Button
-											variant="destructive"
-											size="sm"
-											onclick={async () => {
-												await removeCollaborator({
-													app: data.app?.clientId || '',
-													collaboratorId: collaborator.id
-												});
-												await refreshAll();
-											}}>Remove</Button
-										>
-									</span>
-								</div>
-							</span>
-						{/each}
-						<Separator class="my-2" />
-						<Button class="w-full" onclick={() => (dialogState.transferOwnershipDialogOpen = true)}
-							>Transfer Ownership</Button
-						>
-						<Button
-							class="mt-2 w-full"
-							onclick={() => (dialogState.addCollaboratorDialogOpen = true)}
-						>
-							Add Collaborator
+							Delete Application
 						</Button>
 					</Card.Content>
 				</Card.Root>
@@ -275,7 +191,7 @@
 		title="Regenerate Client Secret"
 		description="Are you sure you want to invalidate the client secret? It will be invalidated immediately."
 		onConfirm={async () => {
-			const result = await rotateClientSecret(data.app?.clientId || '');
+			const result = await rotateClientSecret(data.app?.client_id || '');
 			await refreshAll();
 			newClientSecret = result || null;
 			dialogState.resetClientSecretDialogOpen = false;
@@ -288,7 +204,7 @@
 		title="Revoke Access Tokens"
 		description="Are you sure you want to revoke all access tokens for this application? This action cannot be undone."
 		onConfirm={async () => {
-			await revokeAuthorization(data.app?.clientId || '');
+			await revokeAuthorization(data.app?.client_id || '');
 			await refreshAll();
 			dialogState.revokeAccessTokensDialogOpen = false;
 		}}
@@ -300,52 +216,11 @@
 		title="Delete Application"
 		description="Are you sure you want to delete this application? This action cannot be undone."
 		onConfirm={async () => {
-			await deleteApp(data.app?.clientId || '');
+			await deleteApp(data.app?.client_id || '');
 			await refreshAll();
 			dialogState.deleteApplicationDialogOpen = false;
 		}}
 	/>
-
-	{let newOwnerEmail = $state('')}
-	<ConfirmDialog
-		bind:open={dialogState.transferOwnershipDialogOpen}
-		title="Transfer Ownership"
-		description="Are you sure you want to transfer ownership of this application? Please make sure to get confirmation beforehand from the Clubs team"
-		onConfirm={async () => {
-			await transferOwnership({ app: data.app?.clientId || '', newOwnerEmail });
-			await refreshAll();
-			dialogState.transferOwnershipDialogOpen = false;
-		}}
-	>
-		<Input
-			placeholder="Enter the email of the new owner"
-			type="email"
-			class="my-2"
-			bind:value={newOwnerEmail}
-		/>
-	</ConfirmDialog>
-
-	{let newCollaboratorEmail = $state('')}
-	<ConfirmDialog
-		bind:open={dialogState.addCollaboratorDialogOpen}
-		title="Add Collaborator"
-		description="Enter the email of the new collaborator you want to add to this application."
-		onConfirm={async () => {
-			await addCollaborator({
-				app: data.app?.clientId || '',
-				collaboratorEmail: newCollaboratorEmail
-			});
-			await refreshAll();
-			dialogState.addCollaboratorDialogOpen = false;
-		}}
-	>
-		<Input
-			placeholder="Enter the email of the new owner"
-			type="email"
-			class="my-2"
-			bind:value={newCollaboratorEmail}
-		/>
-	</ConfirmDialog>
 {:else}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<Card.Root class="mx-auto w-full max-w-sm">
