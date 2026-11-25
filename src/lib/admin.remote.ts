@@ -32,6 +32,7 @@ export const processRequest = command(
 					.update(schema.applicationRequests)
 					.set({
 						status: 'rejected',
+						reviewerId: event.locals.user?.id ?? null,
 						process_reason: app.reason ?? null
 					})
 					.where(eq(schema.applicationRequests.id, app.id));
@@ -93,6 +94,7 @@ export const processRequest = command(
 				.update(schema.applicationRequests)
 				.set({
 					status: 'accepted',
+					reviewerId: event.locals.user?.id ?? null,
 					process_reason: app.reason ?? null
 				})
 				.where(eq(schema.applicationRequests.id, app.id));

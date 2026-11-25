@@ -1,6 +1,7 @@
 <script lang="ts" module>
 	import FolderKanbanIcon from '@lucide/svelte/icons/folder-kanban';
 	import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard';
+	import UserGroupIcon from '@lucide/svelte/icons/user-group';
 	import NotebookIcon from '@lucide/svelte/icons/notebook-pen';
 
 	export const data: {
@@ -12,6 +13,11 @@
 				title: 'Dashboard',
 				icon: LayoutDashboardIcon,
 				url: '/developer/dashboard'
+			},
+			{
+				title: 'Organization',
+				icon: UserGroupIcon,
+				url: '/developer/organization'
 			},
 			{
 				title: 'Applications',

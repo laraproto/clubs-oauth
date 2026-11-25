@@ -18,20 +18,21 @@
 		reviewer,
 		process_reason
 	}: {
-		status: 'pending' | 'approved' | 'rejected';
+		status: 'pending' | 'accepted' | 'rejected';
 		id: string;
 		reviewer: ApplicationRequestSelectSchema['reviewer'];
 		process_reason: string | null;
 	} = $props();
 
 	let processWorking = $state(false);
-	let rejectOpen = $state(false);
+	let processOpen = $state(false);
+	let expectedAction = $state<'accept' | 'reject' | null>(null);
 	let reason = $state('');
 
-	const processApplication = async (action: 'approve' | 'reject') => {
+	const processApplication = async (action: 'accept' | 'reject') => {
 		if (processWorking) return;
 		processWorking = true;
-		await processRequest({ id, accept: action === 'approve', reason: process_reason });
+		await processRequest({ id, accept: action === 'accept', reason: process_reason });
 		processWorking = false;
 		await refreshAll();
 	};
@@ -44,16 +45,18 @@
 {#if status === 'pending'}
 	<Button
 		onclick={() => {
-			processApplication('approve');
+			expectedAction = 'accept';
+			processOpen = true;
 		}}
 		disabled={processWorking}
 	>
 		{#if processWorking}<Spinner />{/if}
-		Approve
+		Accept
 	</Button>
 	<Button
 		onclick={() => {
-			rejectOpen = true;
+			expectedAction = 'reject';
+			processOpen = true;
 		}}
 		variant="destructive"
 		disabled={processWorking}
@@ -61,7 +64,7 @@
 		{#if processWorking}<Spinner />{/if}
 		Reject
 	</Button>
-	<Dialog.Root bind:open={rejectOpen}>
+	<Dialog.Root bind:open={processOpen}>
 		<Dialog.Content
 			showCloseButton={!processWorking}
 			onInteractOutside={(event) => {
@@ -75,15 +78,15 @@
 				class="grid gap-4"
 				onsubmit={(event) => {
 					event.preventDefault();
-					processApplication('reject');
+					processApplication(expectedAction!);
 				}}
 			>
 				<Dialog.Header>
-					<Dialog.Title>Reject application</Dialog.Title>
+					<Dialog.Title>Process Application Request</Dialog.Title>
 					<Dialog.Description>They'll see what you put here</Dialog.Description>
 				</Dialog.Header>
 				<div class="grid gap-2">
-					<Label for={`rejection-reason-${id}`}>Rejection reason</Label>
+					<Label for={`rejection-reason-${id}`}>Process reason</Label>
 					<Textarea
 						id={`rejection-reason-${id}`}
 						bind:value={reason}
@@ -100,27 +103,27 @@
 						variant="outline"
 						disabled={processWorking}
 						onclick={() => {
-							rejectOpen = false;
+							processOpen = false;
 						}}
 					>
 						Cancel
 					</Button>
 					<Button type="submit" variant="destructive" disabled={processWorking || !reason.trim()}>
 						{#if processWorking}<Spinner />{/if}
-						Reject and send email
+						Process Request
 					</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
 	</Dialog.Root>
-{:else if status === 'approved'}
+{:else if status === 'accepted'}
 	<span class="max-w-1/16 text-sm wrap-break-word whitespace-normal text-primary">
-		Approved by {typeof reviewer === 'string' ? reviewer : reviewer?.email}
+		Accepted by {reviewer?.email || 'Unknown'}
 		{#if process_reason}<p class="mt-1 whitespace-pre-wrap">{process_reason}</p>{/if}
 	</span>
 {:else if status === 'rejected'}
 	<div class="text-sm wrap-break-word whitespace-normal text-destructive">
-		<span>Rejected by {typeof reviewer === 'string' ? reviewer : reviewer?.email}</span>
+		<span>Rejected by {reviewer?.email || 'Unknown'}</span>
 		{#if process_reason}<p class="mt-1 whitespace-pre-wrap">{process_reason}</p>{/if}
 	</div>
 {/if}

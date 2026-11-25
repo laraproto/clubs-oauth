@@ -79,6 +79,7 @@ export const revokeAuthorization = command(z.string(), async (app) => {
 	});
 
 	if (tokens.length === 0) {
+		setFlash({ type: 'info', message: 'No access tokens to revoke' }, event.cookies);
 		return false;
 	}
 

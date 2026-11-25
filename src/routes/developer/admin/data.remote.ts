@@ -2,7 +2,7 @@ import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { db, schema } from '#lib/server/db';
-import { count, or, inArray, ilike, eq } from 'drizzle-orm';
+import { count, or, inArray, ilike } from 'drizzle-orm';
 
 export const getApp = query(z.string(), async (id: string) => {
 	const event = getRequestEvent();

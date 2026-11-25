@@ -33,7 +33,7 @@ export const columns = columnHelper.columns([
 				id: row.original.id,
 				reviewer: row.original.reviewer,
 				process_reason: row.original.process_reason,
-				status: row.original.status as 'pending' | 'approved' | 'rejected'
+				status: row.original.status as 'pending' | 'accepted' | 'rejected'
 			});
 		},
 		header: 'Actions'
