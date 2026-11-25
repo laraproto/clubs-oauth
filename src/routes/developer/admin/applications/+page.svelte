@@ -26,11 +26,11 @@
 				<Card.Title class="flex flex-row items-center">
 					{app.name}
 					{#if app.uri}
-						<a href={app.uri} rel="external noopener noreferrer" target="_blank"
-							><LinkIcon
+						<a href={app.uri} rel="external noopener noreferrer" target="_blank">
+							<LinkIcon
 								class="ml-2 size-4 text-muted-foreground hover:cursor-pointer hover:text-primary"
-							/></a
-						>
+							/>
+						</a>
 					{/if}
 				</Card.Title>
 			</Card.Header>
@@ -45,9 +45,11 @@
 				<span class="ml-auto text-sm font-medium text-muted-foreground">
 					<Button
 						variant="outline"
-						href={resolve('/admin/applications/[app]', { app: app.clientId })}
-						size="sm">Edit</Button
+						href={resolve('/developer/admin/applications/[app]', { app: app.clientId })}
+						size="sm"
 					>
+						Edit
+					</Button>
 				</span>
 			</Card.Footer>
 		</Card.Root>

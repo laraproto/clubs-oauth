@@ -5,4 +5,4 @@
 	let { data }: PageProps = $props();
 </script>
 
-<Head title="Admin Overview" />
+<Head title="Overview" />

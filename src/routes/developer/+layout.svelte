@@ -7,7 +7,7 @@
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import AppSidebar from '#lib/components/app-sidebar.svelte';
 	import { page } from '$app/state';
-	import { getApp } from './data.remote';
+	import { getApp } from './admin/data.remote';
 	import type { LayoutProps } from './$types';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { resolve } from '$app/paths';
@@ -58,13 +58,13 @@
 									{#if !isLast}
 										{#if slugMap[segment as keyof typeof slugMap]}
 											{@const name = await slugMap[segment as keyof typeof slugMap].getPath()}
-											<Breadcrumb.Link href={getBreadcrumbHref(segments, index + 1)}
-												>{name}</Breadcrumb.Link
-											>
+											<Breadcrumb.Link href={getBreadcrumbHref(segments, index + 1)}>
+												{name}
+											</Breadcrumb.Link>
 										{:else}
-											<Breadcrumb.Link href={getBreadcrumbHref(segments, index + 1)}
-												>{segment.slice(0, 1).toUpperCase() + segment.slice(1)}</Breadcrumb.Link
-											>
+											<Breadcrumb.Link href={getBreadcrumbHref(segments, index + 1)}>
+												{segment.slice(0, 1).toUpperCase() + segment.slice(1)}
+											</Breadcrumb.Link>
 										{/if}
 									{:else}
 										{#if slugMap[segment as keyof typeof slugMap]}
@@ -99,9 +99,9 @@
 												<Breadcrumb.Page>{name}</Breadcrumb.Page>
 											{/if}
 										{:else}
-											<Breadcrumb.Page
-												>{segment.slice(0, 1).toUpperCase() + segment.slice(1)}</Breadcrumb.Page
-											>
+											<Breadcrumb.Page>
+												{segment.slice(0, 1).toUpperCase() + segment.slice(1)}
+											</Breadcrumb.Page>
 										{/if}
 									{/if}
 								</Breadcrumb.Item>

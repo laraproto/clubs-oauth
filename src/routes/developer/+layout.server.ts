@@ -10,7 +10,7 @@ export const load = (async ({ locals, request, cookies }) => {
 		const result = await auth.api.signInSocial({
 			body: {
 				provider: 'hackclub',
-				callbackURL: '/admin'
+				callbackURL: '/developer'
 			},
 			headers: request.headers
 		});
@@ -19,10 +19,6 @@ export const load = (async ({ locals, request, cookies }) => {
 		} else {
 			return redirect(302, '/');
 		}
-	}
-
-	if (locals.user.role !== 'admin') {
-		return redirect(302, '/');
 	}
 
 	const cookie = cookies.get(SIDEBAR_COOKIE_NAME);

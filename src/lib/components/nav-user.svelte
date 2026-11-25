@@ -9,6 +9,9 @@
 	import { goto } from '$app/navigation';
 	import { signout } from '#lib/auth.remote';
 	import { resolve } from '$app/paths';
+	import ConfirmDialog from './confirm-dialog.svelte';
+
+	let logoutConfirmDialog = $state(false);
 
 	const sidebar = useSidebar();
 </script>
@@ -25,9 +28,9 @@
 					>
 						<Avatar.Root class="size-8 rounded-lg">
 							<Avatar.Image src={sidebar.user.image} alt={sidebar.user.name.split(' ')[0]} />
-							<Avatar.Fallback class="rounded-lg"
-								>{sidebar.user.name.charAt(0).toUpperCase()}</Avatar.Fallback
-							>
+							<Avatar.Fallback class="rounded-lg">
+								{sidebar.user.name.charAt(0).toUpperCase()}
+							</Avatar.Fallback>
 						</Avatar.Root>
 						<div class="grid flex-1 text-start text-sm leading-tight">
 							<!-- Is this so I don't deadname myself? Maybe - Lara -->
@@ -48,9 +51,9 @@
 					<div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
 						<Avatar.Root class="size-8 rounded-lg">
 							<Avatar.Image src={sidebar.user.image} alt={sidebar.user.name} />
-							<Avatar.Fallback class="rounded-lg"
-								>{sidebar.user.name.charAt(0).toUpperCase()}</Avatar.Fallback
-							>
+							<Avatar.Fallback class="rounded-lg">
+								{sidebar.user.name.charAt(0).toUpperCase()}
+							</Avatar.Fallback>
 						</Avatar.Root>
 						<div class="grid flex-1 text-start text-sm leading-tight">
 							<span class="truncate font-medium">{sidebar.user.name.split(' ')[0]}</span>
@@ -69,10 +72,7 @@
 				<DropdownMenu.Item
 					class="cursor-pointer"
 					onclick={async () => {
-						await signout();
-						await goto(resolve('/auth/signin'), {
-							refreshAll: true
-						});
+						logoutConfirmDialog = true;
 					}}
 				>
 					<LogOutIcon />
@@ -82,3 +82,19 @@
 		</DropdownMenu.Root>
 	</Sidebar.MenuItem>
 </Sidebar.Menu>
+
+<ConfirmDialog
+	bind:open={logoutConfirmDialog}
+	title="Are you sure you want to log out?"
+	description="You will be logged out of your current session."
+	onConfirm={async () => {
+		await signout();
+		logoutConfirmDialog = false;
+		await goto(resolve('/auth/signin'), {
+			refreshAll: true
+		});
+	}}
+	onCancel={() => {
+		logoutConfirmDialog = false;
+	}}
+/>

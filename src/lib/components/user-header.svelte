@@ -28,7 +28,7 @@
 				Logout
 			</Button>
 			{#if admin}
-				<Button href={resolve('/admin/dashboard')}>Admin</Button>
+				<Button href={resolve('/developer/dashboard')}>Developer</Button>
 			{/if}
 		</div>
 	</div>

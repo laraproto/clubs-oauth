@@ -10,12 +10,12 @@
 	<Sidebar.GroupLabel>Applications</Sidebar.GroupLabel>
 	<Sidebar.GroupContent class="flex flex-col gap-2">
 		<Sidebar.Menu>
-			{#each sidebar.oauthClients?.slice(0, 4) || [] as item (item.client_name)}
+			{#each sidebar.oauthClients?.slice(0, 4) || [] as item (item.client_id)}
 				<Sidebar.MenuItem>
 					<Sidebar.MenuButton>
 						{#snippet child({ props })}
 							<a
-								href={resolve('/admin/applications/[app]', {
+								href={resolve('/developer/applications/[app]', {
 									app: item.client_id
 								})}
 								{...props}
@@ -37,7 +37,7 @@
 				<Sidebar.MenuItem>
 					<Sidebar.MenuButton>
 						{#snippet child({ props })}
-							<a href={resolve('/admin/applications')} {...props}>
+							<a href={resolve('/developer/applications')} {...props}>
 								<EllipsisIcon />
 								<span>More</span>
 							</a>

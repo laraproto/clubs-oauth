@@ -73,7 +73,7 @@
 				</Card.Root>
 				<span class="flex justify-center">
 					<Button
-						href={resolve('/admin/applications/[app]/edit', { app: data.app?.clientId })}
+						href={resolve('/developer/applications/[app]/edit', { app: data.app?.clientId })}
 						class="w-full">Edit App</Button
 					>
 				</span>

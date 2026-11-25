@@ -6,6 +6,7 @@
 	import type { Component } from 'svelte';
 	import type { ResolvedPathname } from '$app/types';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let {
 		items
@@ -31,7 +32,7 @@
 					class="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
 					tooltipContent="Create Application"
 					onclick={() => {
-						goto('/admin/applications', {
+						goto(resolve('/developer/applications'), {
 							state: {
 								modal: true
 							},
@@ -40,7 +41,7 @@
 					}}
 				>
 					<CirclePlusIcon />
-					<span>Create Application</span>
+					<span>Submit Request</span>
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 			{#each items as mainItem (mainItem.title)}
