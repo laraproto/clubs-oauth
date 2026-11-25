@@ -12,3 +12,5 @@ export const db = drizzle({
 	relations: { ...relations, ...authRelations },
 	client
 });
+
+export * as schema from './schema';

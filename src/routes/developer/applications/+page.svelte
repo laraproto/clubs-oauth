@@ -5,6 +5,7 @@
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
+	import CreateRequest from './create-request.svelte';
 
 	let { data }: PageProps = $props();
 </script>
@@ -46,3 +47,5 @@
 		</Card.Root>
 	{/each}
 </div>
+
+<CreateRequest form={data.requestForm} />

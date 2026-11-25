@@ -2,12 +2,10 @@
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import * as Field from '#lib/components/ui/field/index.js';
-	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { buttonVariants } from '#lib/components/ui/button/index.js';
 	import { page } from '$app/state';
-	import { createApplicationSchema, type CreateApplicationSchema } from './schema';
+	import { createRequestSchema, type CreateRequestSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { untrack } from 'svelte';
@@ -15,14 +13,14 @@
 	let {
 		form: initialForm
 	}: {
-		form: SuperValidated<Infer<CreateApplicationSchema>>;
+		form: SuperValidated<Infer<CreateRequestSchema>>;
 	} = $props();
 
 	const form = superForm(
 		untrack(() => initialForm),
 		{
 			dataType: 'json',
-			validators: zod4Client(createApplicationSchema)
+			validators: zod4Client(createRequestSchema)
 		}
 	);
 
@@ -38,7 +36,7 @@
 	<Dialog.Content class="sm:max-w-md">
 		<form method="POST" use:enhance>
 			<Dialog.Header class="pb-6">
-				<Dialog.Title>New Application</Dialog.Title>
+				<Dialog.Title>New Application Request</Dialog.Title>
 			</Dialog.Header>
 			<div class="flex items-center gap-2">
 				<div class="grid flex-1 gap-2">
@@ -98,25 +96,9 @@
 								/>
 							{/snippet}
 						</Form.Control>
-						<Form.Description
-							>Enter one or more redirect URIs, separated by new lines.</Form.Description
-						>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field {form} name="skipConsent">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Field.Field orientation="horizontal">
-									<Checkbox {...props} bind:checked={$formData.skipConsent} />
-									<Field.Content>
-										<Field.Label for={props.id}>Skip Consent</Field.Label>
-										<Field.Description
-											>Whether to skip the consent page for this application.</Field.Description
-										>
-									</Field.Content>
-								</Field.Field>
-							{/snippet}
-						</Form.Control>
+						<Form.Description>
+							Enter one or more redirect URIs, separated by new lines.
+						</Form.Description>
 						<Form.FieldErrors />
 					</Form.Field>
 				</div>
