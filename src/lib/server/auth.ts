@@ -76,9 +76,12 @@ export const auth = betterAuth({
 		}),
 		jwt({ disableSettingJwtHeader: true }),
 		emailOTP({
-			overrideDefaultEmailVerification: false,
+			overrideDefaultEmailVerification: true,
+			changeEmail: {
+				enabled: true
+			},
 			sendVerificationOTP: async ({ email, otp, type }) => {
-				if (type !== 'sign-in') {
+				if (type !== 'sign-in' && type !== 'change-email') {
 					return;
 				}
 				const OtpEmail = await import('#lib/emails/otpEmail.svelte');
@@ -232,20 +235,20 @@ export const auth = betterAuth({
 							? leaderClub.club_name
 							: null);
 
-					const clubRole =
-						memberClub && memberClub.club_name && memberClub.club_name.length > 0
-							? 'member'
-							: 'leader';
-
-					if (ctx.context.newSession?.user.id && ctx.context.session?.user.id) {
-						await ctx.context.internalAdapter.updateUser(
-							ctx.context.newSession?.user.id || ctx.context.session?.user.id,
-							{
-								clubName,
-								clubRole
-							}
-						);
+					// eslint-disable-next-line no-useless-assignment
+					let clubRole: 'member' | 'leader' | null = null;
+					if (memberClub && memberClub.club_name && memberClub.club_name.length > 0) {
+						clubRole = 'member';
+					} else if (leaderClub && leaderClub.club_name && leaderClub.club_name.length > 0) {
+						clubRole = 'leader';
+					} else {
+						clubRole = null;
 					}
+
+					await ctx.context.internalAdapter.updateUser(ctx.context.newSession.user.id, {
+						clubName,
+						clubRole
+					});
 
 					break;
 				}
@@ -283,10 +286,15 @@ export const auth = betterAuth({
 							? leaderClub.club_name
 							: null);
 
-					const clubRole =
-						memberClub && memberClub.club_name && memberClub.club_name.length > 0
-							? 'member'
-							: 'leader';
+					// eslint-disable-next-line no-useless-assignment
+					let clubRole: 'member' | 'leader' | null = null;
+					if (memberClub && memberClub.club_name && memberClub.club_name.length > 0) {
+						clubRole = 'member';
+					} else if (leaderClub && leaderClub.club_name && leaderClub.club_name.length > 0) {
+						clubRole = 'leader';
+					} else {
+						clubRole = null;
+					}
 
 					if (ctx.context.newSession?.user.id && ctx.context.session?.user.id) {
 						await ctx.context.internalAdapter.updateUser(
@@ -303,7 +311,7 @@ export const auth = betterAuth({
 			}
 		}),
 		before: createAuthMiddleware(async (ctx) => {
-			if (!ctx.path.startsWith('/email-otp')) {
+			if (!ctx.path.startsWith('/email-otp/send-verification-otp')) {
 				return;
 			}
 
@@ -330,8 +338,6 @@ export const auth = betterAuth({
 					cause: isMemberError || isLeaderError
 				});
 			}
-
-			console.log(isMember, isLeader);
 
 			// shitty ai code
 			const inAClub =
