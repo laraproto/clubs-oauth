@@ -17,7 +17,7 @@ export const createRequestSchema = z
 				}
 			),
 		organizationName: z.string().optional(),
-		organizationId: z.string()
+		organizationId: z.string().default('create')
 	})
 	.refine(
 		(data) =>

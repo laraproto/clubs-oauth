@@ -1,0 +1,1 @@
+ALTER TABLE "application_requests" ADD COLUMN "organization_name" text;

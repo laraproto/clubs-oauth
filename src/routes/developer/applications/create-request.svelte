@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
+	import * as Select from '#lib/components/ui/select/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { buttonVariants } from '#lib/components/ui/button/index.js';
@@ -9,12 +10,24 @@
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { untrack } from 'svelte';
+	import { getOrganizations } from './data.remote';
 
 	let {
 		form: initialForm
 	}: {
 		form: SuperValidated<Infer<CreateRequestSchema>>;
 	} = $props();
+
+	const organizations = $derived(
+		(await getOrganizations()).map((organization) => ({
+			value: organization.id,
+			label: organization.name
+		})) ?? []
+	);
+
+	const triggerContent = $derived(
+		organizations.find((f) => f.value === $formData.organizationId)?.label ?? 'Create'
+	);
 
 	const form = superForm(
 		untrack(() => initialForm),
@@ -40,6 +53,41 @@
 			</Dialog.Header>
 			<div class="flex items-center gap-2">
 				<div class="grid flex-1 gap-2">
+					<Form.Field {form} name="organizationId">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Organization</Form.Label>
+								<Select.Root {...props} type="single" bind:value={$formData.organizationId}>
+									<Select.Trigger {...props} class="w-full">
+										{triggerContent}
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Group>
+											{#each organizations as organization (organization.value)}
+												<Select.Item value={organization.value} label={organization.label}>
+													{organization.label}
+												</Select.Item>
+											{/each}
+											<Select.Item value="create" label="Create">Create</Select.Item>
+										</Select.Group>
+									</Select.Content>
+								</Select.Root>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					{#if $formData.organizationId === 'create'}
+						<Form.Field {form} name="organizationName">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label>Organization Name</Form.Label>
+									<Input {...props} bind:value={$formData.organizationName} />
+								{/snippet}
+							</Form.Control>
+							<Form.Description>Name for the new organization.</Form.Description>
+							<Form.FieldErrors />
+						</Form.Field>
+					{/if}
 					<Form.Field {form} name="name">
 						<Form.Control>
 							{#snippet children({ props })}

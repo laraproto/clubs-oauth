@@ -37,11 +37,12 @@ export const actions = {
 				redirectUris: form.data.redirectUris,
 				createOrg: createOrg,
 				organizationId: createOrg ? null : form.data.organizationId,
+				organizationName: createOrg ? form.data.organizationName : null,
 				userId: event.locals.user!.id
 			});
 		} catch (error) {
 			console.error(error);
-			return setError(form, 'An unexpected error occurred, go poke somebody on slack about it');
+			return setError(form, 'An unexpected error occurred, go poke somebody on Slack about it');
 		}
 
 		setFlash(
