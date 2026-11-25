@@ -1,7 +1,7 @@
 import { command, getRequestEvent } from '$app/server';
 import { z } from 'zod';
 import { APIError } from 'better-auth/api';
-import { auth } from '#lib/server/auth';
+import { auth, clientPrivileges } from '#lib/server/auth';
 import { db } from '#lib/server/db';
 import * as schema from '#lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -17,11 +17,36 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 	});
 
 	if (!oauthClient) {
-		setFlash({ type: 'error', message: 'Unknown error' }, event.cookies);
+		setFlash(
+			{ type: 'error', message: 'Client not found or authorization missing' },
+			event.cookies
+		);
 		return false;
 	}
 
 	try {
+		let originalOrgId: string | undefined = undefined;
+		if (event.locals.user?.role === 'admin') {
+			originalOrgId = event.locals.session?.activeOrganizationId ?? undefined;
+			try {
+				await auth.api.addMember({
+					body: {
+						userId: event.locals.user?.id ?? '',
+						organizationId: oauthClient.referenceId!,
+						role: 'owner'
+					}
+				});
+			} catch {
+				//Ignore
+			}
+			await auth.api.setActiveOrganization({
+				body: {
+					organizationId: oauthClient.referenceId
+				},
+				headers: event.request.headers
+			});
+		}
+
 		const result = await auth.api.rotateClientSecret({
 			body: {
 				client_id: app
@@ -29,7 +54,16 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 			headers: event.request.headers
 		});
 
-		setFlash({ type: 'success', message: 'Client secret rotated successfully' }, event.cookies);
+		if (event.locals.user?.role === 'admin') {
+			await auth.api.setActiveOrganization({
+				body: {
+					organizationId: originalOrgId
+				},
+				headers: event.request.headers
+			});
+		}
+
+		setFlash({ type: 'success', message: 'Client secret rotated' }, event.cookies);
 		return result.client_secret;
 	} catch (err) {
 		console.log(err);
@@ -59,6 +93,26 @@ export const revokeAuthorization = command(z.string(), async (app) => {
 	});
 
 	if (!oauthClient) {
+		setFlash(
+			{
+				type: 'error',
+				message: 'Client not found or authorization missing'
+			},
+			event.cookies
+		);
+		return false;
+	}
+
+	if (
+		clientPrivileges &&
+		!(await clientPrivileges({
+			action: 'rotate',
+			headers: event.request.headers,
+			session: event.locals.session,
+			user: event.locals.user,
+			clientId: app
+		}))
+	) {
 		setFlash(
 			{
 				type: 'error',

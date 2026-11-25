@@ -86,15 +86,15 @@
 					<Dialog.Description>They'll see what you put here</Dialog.Description>
 				</Dialog.Header>
 				<div class="grid gap-2">
-					<Label for={`rejection-reason-${id}`}>Process reason</Label>
+					<Label for={`reason-${id}`}>Process reason</Label>
 					<Textarea
-						id={`rejection-reason-${id}`}
-						bind:value={reason}
+						id={`reason-${id}`}
+						bind:value={process_reason}
 						required
 						maxlength={2000}
 						rows={5}
 						disabled={processWorking}
-						placeholder="ur username bad"
+						placeholder="Provide a reason for processing this application request. This will be visible to the applicant."
 					/>
 				</div>
 				<Dialog.Footer>
@@ -108,7 +108,7 @@
 					>
 						Cancel
 					</Button>
-					<Button type="submit" variant="destructive" disabled={processWorking || !reason.trim()}>
+					<Button type="submit" disabled={processWorking || !reason.trim()}>
 						{#if processWorking}<Spinner />{/if}
 						Process Request
 					</Button>

@@ -25,12 +25,11 @@ import clubApi from '#lib/server/clubs';
 import transporter from '#lib/server/mail';
 import render from '../emails';
 
-const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
+export const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
 	action,
 	headers,
 	session,
-	user,
-	clientId
+	user
 }) => {
 	if (user && user.role === 'admin') {
 		return true;
@@ -42,10 +41,6 @@ const clientPrivileges: OAuthOptions['clientPrivileges'] = async ({
 
 	if (action === 'list') {
 		return true;
-	}
-
-	if (!clientId) {
-		return false;
 	}
 
 	if (!session?.activeOrganizationId) return false;
