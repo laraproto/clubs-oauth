@@ -27,6 +27,11 @@
 		],
 		navAdmin: [
 			{
+				title: 'Dashboard',
+				icon: LayoutDashboardIcon,
+				url: '/developer/admin/dashboard'
+			},
+			{
 				title: 'Applications',
 				icon: FolderKanbanIcon,
 				url: '/developer/admin/applications'
@@ -41,14 +46,13 @@
 </script>
 
 <script lang="ts">
-	import CommandIcon from '@lucide/svelte/icons/command';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import NavMain from './nav-main.svelte';
 	import NavProjects from './nav-app.svelte';
 	import NavUser from './nav-user.svelte';
 	import type { ComponentProps } from 'svelte';
-	import { resolve } from '$app/paths';
 	import NavAdmin from './nav-admin.svelte';
+	import OrgSwitcher from './org-switcher.svelte';
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 
@@ -57,24 +61,7 @@
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
 	<Sidebar.Header>
-		<Sidebar.Menu>
-			<Sidebar.MenuItem>
-				<Sidebar.MenuButton size="lg">
-					{#snippet child({ props })}
-						<a href={resolve('/developer/dashboard')} {...props}>
-							<div
-								class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
-							>
-								<CommandIcon class="size-4" />
-							</div>
-							<div class="grid flex-1 text-start text-sm leading-tight">
-								<span class="truncate font-medium">Clubs OAuth</span>
-							</div>
-						</a>
-					{/snippet}
-				</Sidebar.MenuButton>
-			</Sidebar.MenuItem>
-		</Sidebar.Menu>
+		<OrgSwitcher />
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<NavMain items={data.navMain} />

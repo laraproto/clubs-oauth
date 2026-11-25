@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { createRequestSchema } from './schema';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
-import { redirect } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { db, schema } from '#lib/server/db';
 import { resolve } from '$app/paths';
@@ -40,6 +40,13 @@ export const actions = {
 			});
 		} catch (error) {
 			console.error(error);
+			setFlash(
+				{
+					type: 'error',
+					message: 'An unexpected error occurred, go poke somebody on Slack about it'
+				},
+				event.cookies
+			);
 			return setError(form, 'An unexpected error occurred, go poke somebody on Slack about it');
 		}
 

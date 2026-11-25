@@ -30,3 +30,22 @@ export const authConsent = command(z.object({ consent: z.boolean() }), async (da
 		console.error(err);
 	}
 });
+
+export const setActiveOrganization = command(z.string(), async (app) => {
+	const event = getRequestEvent();
+
+	try {
+		await auth.api.setActiveOrganization({
+			body: {
+				organizationId: app
+			},
+			headers: event.request.headers
+		});
+	} catch (err) {
+		if (err instanceof APIError) {
+			console.error(err);
+			return error(500, err.body?.error);
+		}
+		console.error(err);
+	}
+});

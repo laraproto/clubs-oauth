@@ -11,12 +11,15 @@
 	} from './constants.js';
 	import { setSidebar } from './context.svelte.js';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import type { Organization } from 'better-auth/plugins/organization';
 
 	let {
 		ref = $bindable(null),
 		open = $bindable(true),
 		user,
 		oauthClients,
+		organizations,
+		session,
 		onOpenChange = () => {},
 		class: className,
 		style,
@@ -25,14 +28,18 @@
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		open?: boolean;
 		user: Auth['$Infer']['Session']['user'];
+		session: Auth['$Infer']['Session']['session'];
 		oauthClients: OAuthClient[] | null;
+		organizations: Organization[] | null;
 		onOpenChange?: (open: boolean) => void;
 	} = $props();
 
 	const sidebar = setSidebar({
 		open: () => open,
 		user: () => user,
+		session: () => session,
 		oauthClients: () => oauthClients,
+		organizations: () => organizations,
 		setOpen: (value: boolean) => {
 			open = value;
 			onOpenChange(value);

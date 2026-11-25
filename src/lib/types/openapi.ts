@@ -4,1815 +4,1963 @@
  */
 
 export interface paths {
-	'/': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * API Documentation
-		 * @description Returns the API documentation page.
-		 */
-		get: {
-			parameters: {
-				query?: never;
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description HTML documentation page */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content?: never;
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/clubs': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get total number of clubs
-		 * @description Returns the total number of clubs registered.
-		 */
-		get: {
-			parameters: {
-				query?: never;
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Successful response */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							totalClubs?: number;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/clubs/map': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get all clubs for map display
-		 * @description Returns every club with fuzzed coordinates for map display.
-		 *     Fully public, no authentication supported or required.
-		 *     Responses are cached server-side for up to 45 seconds.
-		 */
-		get: {
-			parameters: {
-				query?: never;
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description List of clubs */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							id?: string;
-							fields?: {
-								club_name?: string;
-								/** @description Latitude rounded to ~2 decimal places */
-								venue_lat_fuzz?: number;
-								/** @description Longitude rounded to ~2 decimal places */
-								venue_lng_fuzz?: number;
-								club_status?: string;
-								club_website?: string;
-							};
-						}[];
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/clubs/country': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get amount of clubs in a country
-		 * @description Returns the count of clubs in the specified country.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description The country to filter by (e.g. "USA", "India") */
-					country: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Successful response */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							clubs?: number;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/clubs/level': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get amount of clubs at a level
-		 * @description Returns the count of clubs at the specified level.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description The level to filter by (e.g. "1", "2", "3") */
-					level: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Successful response */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							clubs?: number;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/club': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club info from name
-		 * @description Returns information about a club.
-		 *     Authentication is optional.
-		 *     - No key sent: returns a limited public field set (club_name, status, club_website, leader_slack_id, venue_addr_country).
-		 *     - Valid key sent: returns the full Airtable club record.
-		 *     - Invalid key sent: 401.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club information. Shape depends on whether a valid API key was sent (see description). `{club_name: null}` if no club matches. */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							club_name?: string | null;
-						} & {
-							[key: string]: unknown;
-						};
-					};
-				};
-				/** @description Missing name parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing name parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description An API key was sent but it is invalid */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/club/ambassador': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club ambassador
-		 * @description Returns the email and Slack ID of the ambassador assigned to a club.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Ambassador information */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							email?: string;
-							slackId?: string;
-						};
-					};
-				};
-				/** @description Missing parameter or no ambassador assigned */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing name parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Club or ambassador not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Club not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/leader': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get leader from email
-		 * @description Checks if a leader exists by email.
-		 *     Authentication is optional.
-		 *     - No key sent: returns true/false indicating existence.
-		 *     - Valid key sent: returns the club name and status associated with the leader.
-		 *     - Invalid key sent: 401.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Email of the leader */
-					email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Leader information */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json':
-							| {
-									club_name?: string | null;
-									club_status?: string | null;
-							  }
-							| {
-									leader?: boolean;
-							  };
-					};
-				};
-				/** @description An API key was sent but it is invalid */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		/**
-		 * Change club leader's email
-		 * @description Updates a leader's email address. Requires Write permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description Current email of the leader */
-					email: string;
-					/** @description New email for the leader */
-					new_email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Email updated successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							new_email?: string;
-						};
-					};
-				};
-				/** @description Missing email parameter or leader not found */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/leader/slack': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get leader from Slack ID
-		 * @description Checks if a leader exists by Slack ID.
-		 *     Authentication is optional.
-		 *     - No key sent: returns true/false indicating existence.
-		 *     - Valid key sent: returns the club name and status associated with the leader.
-		 *     - Invalid key sent: 401.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Slack ID of the leader */
-					slackid: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Leader information */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json':
-							| {
-									club_name?: string | null;
-									club_status?: string | null;
-							  }
-							| {
-									leader?: boolean;
-							  };
-					};
-				};
-				/** @description Missing slackid parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing slackid parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description An API key was sent but it is invalid */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/leader/name': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get leader's name by email
-		 * @description Returns the name associated with a leader by email. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Email of the leader */
-					email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Leader name */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							name?: string;
-						};
-					};
-				};
-				/** @description Missing email parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing email parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Leader not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Leader not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/leader/change': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/**
-		 * Replace a club's leader
-		 * @description Creates a new leader record linked to the club and clears the old leader's
-		 *     club link (the old leader record itself is not deleted). Requires Write permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club: string;
-					/** @description Email for the new leader */
-					new_email: string;
-					/** @description Email of the leader being replaced */
-					old_email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Leader replaced successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example true */
-							success?: boolean;
-							new_leader_id?: string;
-						};
-					};
-				};
-				/** @description Missing parameters, club not found, or failed to create the new leader record */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing parameters (club, new_email, old_email) */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/ships': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club ships
-		 * @description Returns the list of ships (projects) associated with every member of a club.
-		 *     Authentication is optional.
-		 *     - No key sent: returns a limited field set per ship (YSWS, Code URL, Playable URL).
-		 *     - Valid key sent: returns the full Unified DB Projects record per ship.
-		 *     - Invalid key sent: 401.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club_name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description List of ships. Shape per item depends on whether a valid API key was sent (see description). */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							[key: string]: unknown;
-						}[];
-					};
-				};
-				/** @description Missing club_name parameter, or club member lookup failed */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							error?: string;
-						};
-					};
-				};
-				/** @description An API key was sent but it is invalid */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/member/ships': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get a member's ships
-		 * @description Returns the list of ships (projects) associated with a member by email. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Email of the member */
-					email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description List of ships */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							[key: string]: unknown;
-						}[];
-					};
-				};
-				/** @description Missing email parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing email parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/member': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get member's club and email by name
-		 * @description Returns the club and email associated with a member by name. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the member */
-					name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Member information including club and email */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							name?: string;
-							/** Format: email */
-							email?: string;
-						};
-					};
-				};
-				/** @description Missing name parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing name parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Member not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Member not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		/**
-		 * Update member information
-		 * @description Updates a member's name and/or email. Requires Write permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description Current name of the member to update */
-					name: string;
-					/** @description New name for the member */
-					new_name?: string;
-					/** @description New email for the member */
-					new_email?: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Member updated successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							name?: string;
-							/** Format: email */
-							email?: string;
-						};
-					};
-				};
-				/** @description Missing name parameter, no updates provided, or member not found */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		/**
-		 * Delete a member
-		 * @description Deletes a member by name. Requires Write permissions.
-		 */
-		delete: {
-			parameters: {
-				query: {
-					/** @description Name of the member to delete */
-					name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Member deleted successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example true */
-							deleted?: boolean;
-							id?: string;
-						};
-					};
-				};
-				/** @description Missing name parameter or failed to delete */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Member not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Member not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/member/email': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get member's club by email
-		 * @description Returns the club name associated with a member by email. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Email of the member */
-					email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club name associated with the member */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							club_name?: string | null;
-						};
-					};
-				};
-				/** @description Missing email parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing email parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Member not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Member not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/member/name': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get member's name by email
-		 * @description Returns the name associated with a member by email. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Email of the member */
-					email: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Member name */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							name?: string;
-						};
-					};
-				};
-				/** @description Missing email parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing email parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Member not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Member not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/member/slack': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get member's club by Slack ID
-		 * @description Returns the club name associated with a member by Slack ID. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Slack ID of the member */
-					slackid: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club name associated with the member */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							club_name?: string | null;
-						};
-					};
-				};
-				/** @description Missing slackid parameter */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing slackid parameter */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Member not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Member not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/members': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club members
-		 * @description Returns the list of member names for the specified club. Requires Read permissions.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club_name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club members */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							members?: string[];
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-				/** @description Club not found */
-				404: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Club not found */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/level': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club level
-		 * @description Returns the level of the specified club.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club_name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club level */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							level?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		/**
-		 * Change club level
-		 * @description Updates the level of a club. Requires Write permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club_name: string;
-					/** @description New level for the club */
-					level: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Level updated successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							new_level?: string;
-						};
-					};
-				};
-				/** @description Missing parameters or club not found */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/status': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club status
-		 * @description Returns the status of the specified club.
-		 */
-		get: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club_name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club status */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							status?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		/**
-		 * Change club status
-		 * @description Updates the status of a club. Requires Write permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description Name of the club */
-					club_name: string;
-					/** @description New status for the club */
-					status: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Status updated successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							new_status?: string;
-						};
-					};
-				};
-				/** @description Missing parameters or club not found */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/dormant': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * Get club dormant status
-		 * @description Returns whether the specified club's status is currently "Dormant".
-		 */
-		get: {
-			parameters: {
-				query: {
-					/**
-					 * @description Name of the club
-					 * @example Example Club
-					 */
-					club_name: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Club dormant status */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Example Club */
-							club_name?: string;
-							/** @example false */
-							dormant?: boolean;
-						};
-					};
-				};
-				/** @description Missing club_name parameter or club not found */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing club_name parameter */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		put?: never;
-		/**
-		 * Update club dormant status
-		 * @description Sets a club's status to "Dormant" (dormant=true) or "Active" (dormant=false). Requires Write permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/**
-					 * @description Name of the club
-					 * @example Example Club
-					 */
-					club_name: string;
-					/**
-					 * @description Dormant status (true or false)
-					 * @example true
-					 */
-					dormant: 'true' | 'false';
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Dormant status updated successfully */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Example Club */
-							club_name?: string;
-							/** @example true */
-							dormant?: boolean;
-						};
-					};
-				};
-				/** @description Missing parameters, invalid dormant value, or club not found */
-				400: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Missing parameters (club_name, dormant) */
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/key/create': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/**
-		 * Create a new API key
-		 * @description Creates a new API key with the given name and permission level. Requires Admin permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description Label for the new key (e.g. the owner's name) */
-					name: string;
-					/** @description Permission level for the new key */
-					perms: 'read' | 'write' | 'admin';
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Key created, or creation failed (see success field) */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							success?: boolean;
-							key?: string;
-							name?: string;
-							perms?: string;
-							error?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/key/revoke': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/**
-		 * Revoke an API key
-		 * @description Deletes an API key. Requires Admin permissions.
-		 */
-		post: {
-			parameters: {
-				query: {
-					/** @description The API key value to revoke */
-					key: string;
-				};
-				header?: never;
-				path?: never;
-				cookie?: never;
-			};
-			requestBody?: never;
-			responses: {
-				/** @description Revocation result */
-				200: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							success?: boolean;
-							owner_email?: string;
-						};
-					};
-				};
-				/** @description Unauthorized */
-				401: {
-					headers: {
-						[name: string]: unknown;
-					};
-					content: {
-						'application/json': {
-							/** @example Unauthorized */
-							error?: string;
-						};
-					};
-				};
-			};
-		};
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
+    "/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API Documentation
+         * @description Returns the API documentation page.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description HTML documentation page */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get total number of clubs
+         * @description Returns the number of clubs that aren't dormant, the same count as the Clubs platform's club directory.
+         *     Refreshed from Airtable in the background about once a minute.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            totalClubs?: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clubs/map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all clubs for map display
+         * @description Returns the same pins as the Clubs platform's public map (clubs.hackclub.com/explore/map), with the same positions.
+         *     A pin is never the club's real venue unless its leader chose that: by default it sits a random 0.5-3 km away.
+         *     Dormant clubs, clubs a leader took off the map and clubs HQ has hidden are left out, as on the platform.
+         *     The profile link and website only appear for clubs whose leader made the profile public.
+         *     Fully public, no authentication supported or required. Refreshed about once a minute.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of clubs */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description Airtable record ID of the club */
+                            id?: string;
+                            fields?: {
+                                club_name?: string;
+                                /** @description Latitude of the platform's map pin */
+                                venue_lat_fuzz?: number;
+                                /** @description Longitude of the platform's map pin */
+                                venue_lng_fuzz?: number;
+                                club_status?: string;
+                                /** @description Where the club is, as the platform shows it (the country unless the club opted in to its town) */
+                                place?: string;
+                                country?: string;
+                                /** @description Approved ships made on the platform */
+                                ship_count?: number;
+                                /** @description Only for clubs with a public profile */
+                                profile_url?: string;
+                                /** @description Only for clubs with a public profile */
+                                club_website?: string;
+                            };
+                        }[];
+                    };
+                };
+                /** @description The Clubs platform's map couldn't be loaded */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clubs/country": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get amount of clubs in a country
+         * @description Returns the number of clubs that aren't dormant whose venue is in the country (case-insensitive, as spelled in the Clubs base, e.g. "United States").
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description The country to filter by (e.g. "United States", "India") */
+                    country: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            clubs?: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clubs/level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retired - club levels
+         * @description Club levels were retired; the Clubs platform has no levels. Always responds 410.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club levels were retired */
+                410: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get club info from name
+         * @description Returns information about a club.
+         *     Authentication is optional.
+         *     - No key sent: what the Clubs platform shows signed-out. Clubs on its public map return their name, status, place, country and ship count; clubs with a public profile also return the profile link, website and member count (unless the club hides it). Anything else returns `{club_name: null}`.
+         *     - Valid key sent: returns the full Airtable club record, with `member_count` counted the way the platform counts members (active members plus leaders).
+         *     - Invalid key sent: 401.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club information. Shape depends on whether a valid API key was sent (see description). `{club_name: null}` if no club matches. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            club_name?: string | null;
+                        } & {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+                /** @description Missing name parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing name parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description An API key was sent but it is invalid */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/club/ambassador": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get club ambassador
+         * @description Returns the email and Slack ID of the ambassador assigned to a club.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Ambassador information */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            email?: string;
+                            slackId?: string;
+                        };
+                    };
+                };
+                /** @description Missing parameter or no ambassador assigned */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing name parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Club or ambassador not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Club not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leader": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get leader from email
+         * @description Returns the club a person leads, looked up by email. Requires Read permissions.
+         *     Leaders are counted the way the Clubs platform counts them: a Leaders record linked to a club, or an active member whose member type is co-leader. `role` says which.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Email of the leader */
+                    email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Leader information */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            club_name?: string | null;
+                            club_status?: string | null;
+                            /**
+                             * @description Absent when the person doesn't lead a club
+                             * @enum {string}
+                             */
+                            role?: "leader" | "co-leader";
+                        };
+                    };
+                };
+                /** @description An API key was sent but it is invalid */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Change club leader's email
+         * @description Updates a leader's email address. Requires Write permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /** @description Current email of the leader */
+                    email: string;
+                    /** @description New email for the leader */
+                    new_email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Email updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            new_email?: string;
+                        };
+                    };
+                };
+                /** @description Missing email parameter or leader not found */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leader/slack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get leader from Slack ID
+         * @description Returns the club a person leads, looked up by Slack ID. Requires Read permissions.
+         *     Leaders are counted the way the Clubs platform counts them: a Leaders record linked to a club, or an active member whose member type is co-leader. `role` says which.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Slack ID of the leader */
+                    slackid: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Leader information */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            club_name?: string | null;
+                            club_status?: string | null;
+                            /**
+                             * @description Absent when the person doesn't lead a club
+                             * @enum {string}
+                             */
+                            role?: "leader" | "co-leader";
+                        };
+                    };
+                };
+                /** @description Missing slackid parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing slackid parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description An API key was sent but it is invalid */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leader/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get leader's name by email
+         * @description Returns the name of a leader or co-leader by email (leaders counted as in GET /leader). Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Email of the leader */
+                    email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Leader name */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name?: string;
+                        };
+                    };
+                };
+                /** @description Missing email parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing email parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Leader not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Leader not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leader/change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Replace a club's leader
+         * @description Creates a new leader record linked to the club and clears the old leader's
+         *     club link (the old leader record itself is not deleted). Requires Write permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    club: string;
+                    /** @description Email for the new leader */
+                    new_email: string;
+                    /** @description Email of the leader being replaced */
+                    old_email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Leader replaced successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example true */
+                            success?: boolean;
+                            new_leader_id?: string;
+                        };
+                    };
+                };
+                /** @description Missing parameters, club not found, or failed to create the new leader record */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing parameters (club, new_email, old_email) */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get club ships
+         * @description Returns a club's ships the way the Clubs platform counts them. Each item has a `source`:
+         *     - `platform`: approved ships made on the platform (Club Workshops base, Projects table, Status Approved or Submitted).
+         *     - `external`: ships to other YSWS programs that the platform's external-ships job linked to this club (Club Stats base, Unified DB table).
+         *     Authentication is optional.
+         *     - No key sent: the ships the club's public profile on the platform shows (Title, Description, Playable URL, Workshop, Approved At), with no code links. Clubs without a public profile return an empty list.
+         *     - Valid key sent: the full Airtable record of every platform and external ship.
+         *     - Invalid key sent: 401.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    club_name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of ships. Shape per item depends on whether a valid API key was sent (see description). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            [key: string]: unknown;
+                        }[];
+                    };
+                };
+                /** @description Missing club_name parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description An API key was sent but it is invalid */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member/ships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a member's ships
+         * @description Returns the list of ships (projects) associated with a member by email. Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Email of the member */
+                    email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of ships */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            [key: string]: unknown;
+                        }[];
+                    };
+                };
+                /** @description Missing email parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing email parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get member's club and email by name
+         * @description Returns the club and email associated with a member by name. Only active members count (pending join requests and removed members are not found, as on the Clubs platform). Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Name of the member */
+                    name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Member information including club and email */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name?: string;
+                            /** Format: email */
+                            email?: string;
+                        };
+                    };
+                };
+                /** @description Missing name parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing name parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Member not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Member not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Update member information
+         * @description Updates a member's name and/or email. Requires Write permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /** @description Current name of the member to update */
+                    name: string;
+                    /** @description New name for the member */
+                    new_name?: string;
+                    /** @description New email for the member */
+                    new_email?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Member updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name?: string;
+                            /** Format: email */
+                            email?: string;
+                        };
+                    };
+                };
+                /** @description Missing name parameter, no updates provided, or member not found */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        /**
+         * Delete a member
+         * @description Deletes a member by name. Requires Write permissions.
+         */
+        delete: {
+            parameters: {
+                query: {
+                    /** @description Name of the member to delete */
+                    name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Member deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example true */
+                            deleted?: boolean;
+                            id?: string;
+                        };
+                    };
+                };
+                /** @description Missing name parameter or failed to delete */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Member not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Member not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get member's club by email
+         * @description Returns the club name associated with a member by email. Only active members count (pending join requests and removed members are not found, as on the Clubs platform). Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Email of the member */
+                    email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club name associated with the member */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            club_name?: string | null;
+                        };
+                    };
+                };
+                /** @description Missing email parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing email parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Member not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Member not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get member's name by email
+         * @description Returns the name associated with a member by email. Only active members count (pending join requests and removed members are not found, as on the Clubs platform). Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Email of the member */
+                    email: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Member name */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name?: string;
+                        };
+                    };
+                };
+                /** @description Missing email parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing email parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Member not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Member not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member/slack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get member's club by Slack ID
+         * @description Returns the club name associated with a member by Slack ID. Only active members count (pending join requests and removed members are not found, as on the Clubs platform). Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Slack ID of the member */
+                    slackid: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club name associated with the member */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            club_name?: string | null;
+                        };
+                    };
+                };
+                /** @description Missing slackid parameter */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing slackid parameter */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Member not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Member not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/person": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get person's clubs
+         * @description Combines `/leader`, `/leader/slack`, `/member/email`, `/member/slack`, `/member/name` and `/club` into one request.
+         *     Pass a Slack ID and/or one or more emails. Leader and member results are reported separately for each identifier so mismatches stay visible,
+         *     and every matched club's full record is included under `clubs`, keyed by club name (same shape as `/club`).
+         *     Matching ignores case. Requires Read permissions.
+         *     Leaders and members are counted the way the Clubs platform counts them: a leader is a Leaders record linked to a club or an active co-leader member (`role` says which), and pending join requests and removed members are not members.
+         *     Each club's `member_count` is active members plus leaders, as on the platform.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /**
+                     * @description Slack ID to look up
+                     * @example U01ABCDEFGH
+                     */
+                    slackid?: string;
+                    /**
+                     * @description Comma-separated emails to look up (up to 20)
+                     * @example leader@example.com,leader.personal@example.com
+                     */
+                    emails?: string;
+                    /** @description A single email to look up; combined with `emails` if both are given */
+                    email?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Matches for each identifier provided, the member's registered name, and the matched clubs' records. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        /**
+                         * @example {
+                         *       "leader": {
+                         *         "by_slack": {
+                         *           "found": true,
+                         *           "club_name": "Example High School",
+                         *           "club_status": "Active"
+                         *         },
+                         *         "by_email": {
+                         *           "leader@example.com": {
+                         *             "found": true,
+                         *             "club_name": "Example High School",
+                         *             "club_status": "Active"
+                         *           }
+                         *         }
+                         *       },
+                         *       "member": {
+                         *         "by_slack": {
+                         *           "found": false
+                         *         },
+                         *         "by_email": {
+                         *           "leader@example.com": {
+                         *             "found": false
+                         *           }
+                         *         }
+                         *       },
+                         *       "clubs": {
+                         *         "Example High School": {
+                         *           "id": "recXXXXXXXXXXXXXX",
+                         *           "createdTime": "2025-09-01T12:00:00.000Z",
+                         *           "fields": {
+                         *             "club_name": "Example High School",
+                         *             "status": "Active"
+                         *           }
+                         *         }
+                         *       }
+                         *     }
+                         */
+                        "application/json": {
+                            leader?: {
+                                by_slack?: components["schemas"]["PersonLeaderMatch"];
+                                /** @description Keyed by email */
+                                by_email?: {
+                                    [key: string]: components["schemas"]["PersonLeaderMatch"];
+                                };
+                            };
+                            member?: {
+                                by_slack?: components["schemas"]["PersonMemberMatch"];
+                                /** @description Keyed by email */
+                                by_email?: {
+                                    [key: string]: components["schemas"]["PersonMemberMatch"];
+                                };
+                            };
+                            /** @description Name on the first member record matched by email, if any (same as `/member/name`) */
+                            member_name?: string;
+                            /** @description Full Airtable record for each matched club, keyed by club name (same shape as `/club`) */
+                            clubs?: {
+                                [key: string]: Record<string, never>;
+                            };
+                        };
+                    };
+                };
+                /** @description No identifiers provided, or more than 20 emails */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Provide a slackid, an email, or a comma-separated emails list */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Airtable lookup failed */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Failed to look up this person in Airtable */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get club members
+         * @description Returns the names of the club's active members (pending join requests and removed members are left out, as on the Clubs platform). Requires Read permissions.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    club_name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club members */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            members?: string[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Club not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Club not found */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retired - club level
+         * @description Club levels were retired; the Clubs platform has no levels. Always responds 410.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club levels were retired */
+                410: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Retired - change club level
+         * @description Club levels were retired; the Clubs platform has no levels. Responds 410 to a Write key, 401 otherwise.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Club levels were retired */
+                410: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get club status
+         * @description Returns the status of the specified club.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    club_name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Change club status
+         * @description Updates the status of a club. Requires Write permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /** @description Name of the club */
+                    club_name: string;
+                    /** @description New status for the club */
+                    status: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Status updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            new_status?: string;
+                        };
+                    };
+                };
+                /** @description Missing parameters or club not found */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dormant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get club dormant status
+         * @description Returns whether the specified club's status is currently "Dormant".
+         */
+        get: {
+            parameters: {
+                query: {
+                    /**
+                     * @description Name of the club
+                     * @example Example Club
+                     */
+                    club_name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Club dormant status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Example Club */
+                            club_name?: string;
+                            /** @example false */
+                            dormant?: boolean;
+                        };
+                    };
+                };
+                /** @description Missing club_name parameter or club not found */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing club_name parameter */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Update club dormant status
+         * @description Sets a club's status to "Dormant" (dormant=true) or "Active" (dormant=false). Requires Write permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /**
+                     * @description Name of the club
+                     * @example Example Club
+                     */
+                    club_name: string;
+                    /**
+                     * @description Dormant status (true or false)
+                     * @example true
+                     */
+                    dormant: "true" | "false";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Dormant status updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Example Club */
+                            club_name?: string;
+                            /** @example true */
+                            dormant?: boolean;
+                        };
+                    };
+                };
+                /** @description Missing parameters, invalid dormant value, or club not found */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Missing parameters (club_name, dormant) */
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/key/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new API key
+         * @description Creates a new API key with the given name and permission level. Requires Admin permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /** @description Label for the new key (e.g. the owner's name) */
+                    name: string;
+                    /** @description Permission level for the new key */
+                    perms: "read" | "write" | "admin";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Key created, or creation failed (see success field) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success?: boolean;
+                            key?: string;
+                            name?: string;
+                            perms?: string;
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/key/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revoke an API key
+         * @description Deletes an API key. Requires Admin permissions.
+         */
+        post: {
+            parameters: {
+                query: {
+                    /** @description The API key value to revoke */
+                    key: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Revocation result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success?: boolean;
+                            owner_email?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-	schemas: never;
-	responses: never;
-	parameters: never;
-	requestBodies: never;
-	headers: never;
-	pathItems: never;
+    schemas: {
+        PersonLeaderMatch: {
+            found?: boolean;
+            /** @description Present when found and the leader is linked to a club */
+            club_name?: string;
+            /** @description Present when found and the leader is linked to a club */
+            club_status?: string;
+            /**
+             * @description Present when found
+             * @enum {string}
+             */
+            role?: "leader" | "co-leader";
+        };
+        PersonMemberMatch: {
+            found?: boolean;
+            /** @description Present when found and the member is linked to a club */
+            club_name?: string;
+        };
+    };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

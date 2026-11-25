@@ -88,18 +88,20 @@ export const actions = {
 				},
 				headers: event.request.headers
 			});
-
-			if (params.has('redirect_uri')) {
-				return redirect(303, `/auth/consent?${params.toString()}`);
-			} else {
-				return redirect(303, decodeURIComponent(params.get('return_to') || '/user'));
-			}
 		} catch (err) {
 			if (err instanceof APIError) {
 				return setError(form, 'otp', err.message);
 			}
 			console.error(err);
 			return setError(form, 'otp', 'Unknown error.');
+		}
+
+		if (params.has('redirect_uri')) {
+			console.log('Redirecting to consent page with params:', params.toString());
+			return redirect(303, `/auth/consent?${params.toString()}`);
+		} else {
+			console.log('Redirecting to return_to or /user');
+			return redirect(303, decodeURIComponent(params.get('return_to') || '/user'));
 		}
 	},
 	hca: async (event) => {

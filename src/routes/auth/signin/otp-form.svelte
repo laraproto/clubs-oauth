@@ -4,6 +4,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
+	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
 	import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
 	import { otpFormSchema, type OtpFormSchema } from './schema';
@@ -13,6 +14,7 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { onMount, untrack } from 'svelte';
 	import Head from '#lib/components/head.svelte';
+	import { page } from '$app/state';
 
 	let {
 		ref = $bindable(null),
@@ -38,7 +40,7 @@
 		}
 	);
 
-	const { form: formData, errors, message, enhance } = form;
+	const { form: formData, errors, message, enhance, submitting } = form;
 
 	onMount(() => {
 		$formData.email = email;
@@ -50,7 +52,7 @@
 <form
 	class={cn('flex flex-col gap-6', className)}
 	bind:this={ref}
-	action="?/otp"
+	action={`?/otp&${page.url.searchParams.toString()}`}
 	method="POST"
 	use:enhance
 	{...restProps}
@@ -90,7 +92,14 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<Field>
-			<Form.Button type="submit">Login</Form.Button>
+			<Form.Button type="submit">
+				{#if $submitting}
+					<Spinner class="me-2" />
+					Please wait, clubapi is slow
+				{:else}
+					Login
+				{/if}
+			</Form.Button>
 			<Button variant="link" onclick={() => history.back()}>Go back to email input</Button>
 		</Field>
 	</FieldGroup>

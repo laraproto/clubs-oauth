@@ -38,7 +38,13 @@
 			.join('/');
 </script>
 
-<Sidebar.Provider oauthClients={data.oauthClients} user={data.user} open={data.sidebarOpen}>
+<Sidebar.Provider
+	oauthClients={data.oauthClients}
+	organizations={data.organizations}
+	user={data.user}
+	session={data.session}
+	open={data.sidebarOpen}
+>
 	<AppSidebar />
 	<Sidebar.Inset>
 		<header class="flex h-16 shrink-0 items-center gap-2">

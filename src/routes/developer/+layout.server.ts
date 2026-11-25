@@ -4,9 +4,10 @@ import { APIError } from 'better-auth/api';
 import type { LayoutServerLoad } from './$types';
 import { error, redirect } from '@sveltejs/kit';
 import type { OAuthClient } from '@better-auth/oauth-provider';
+import type { Organization } from 'better-auth/plugins/organization';
 
 export const load = (async ({ locals, request, cookies }) => {
-	if (!locals.user) {
+	if (!locals.user || !locals.session) {
 		const result = await auth.api.signInSocial({
 			body: {
 				provider: 'hackclub',
@@ -24,12 +25,17 @@ export const load = (async ({ locals, request, cookies }) => {
 	const cookie = cookies.get(SIDEBAR_COOKIE_NAME);
 
 	let oauthClients: OAuthClient[] | null = [];
+	let organizations: Organization[] | null = [];
 
 	try {
-		const result = await auth.api.getOAuthClients({
+		const oauthClientResult = await auth.api.getOAuthClients({
 			headers: request.headers
 		});
-		oauthClients = result;
+		const organizationResult = await auth.api.listOrganizations({
+			headers: request.headers
+		});
+		organizations = organizationResult;
+		oauthClients = oauthClientResult;
 	} catch (err) {
 		if (err instanceof APIError) {
 			if (err.statusCode !== 401) {
@@ -40,6 +46,8 @@ export const load = (async ({ locals, request, cookies }) => {
 
 	return {
 		user: locals.user,
+		session: locals.session,
+		organizations,
 		oauthClients,
 		sidebarOpen: cookie ? cookie === 'true' : true
 	};

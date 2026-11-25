@@ -5,6 +5,7 @@ import * as schema from '#lib/server/db/schema';
 import { auth } from '#lib/server/auth';
 import { eq } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
+import { APIError } from 'better-auth';
 
 export const processRequest = command(
 	z.object({
@@ -60,16 +61,24 @@ export const processRequest = command(
 
 			const originalOrganizationId =
 				(event.locals.session?.activeOrganizationId as string | undefined) ?? undefined;
+			let partOfOrg = false;
+			let memberId: string | undefined = undefined;
 
 			try {
-				await auth.api.addMember({
+				const result = await auth.api.addMember({
 					body: {
 						userId: event.locals.user?.id ?? '',
 						organizationId: organizationId ?? undefined,
-						role: 'owner'
+						role: 'admin'
 					}
 				});
-			} catch {
+				memberId = result.id;
+			} catch (err) {
+				if (err instanceof APIError) {
+					if (err.body?.code === 'USER_IS_ALREADY_A_MEMBER_OF_THIS_ORGANIZATION') {
+						partOfOrg = true;
+					}
+				}
 				//Ignore
 			}
 
@@ -97,6 +106,21 @@ export const processRequest = command(
 				},
 				headers: event.request.headers
 			});
+
+			if (!partOfOrg && memberId) {
+				try {
+					await auth.api.removeMember({
+						body: {
+							memberIdOrEmail: memberId,
+							organizationId: organizationId ?? undefined
+						},
+						headers: event.request.headers
+					});
+				} catch (err) {
+					console.error(err);
+					//Ignore
+				}
+			}
 
 			await db
 				.update(schema.applicationRequests)

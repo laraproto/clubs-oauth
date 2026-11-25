@@ -26,18 +26,26 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 
 	try {
 		let originalOrgId: string | undefined = undefined;
+		let partOfOrg = false;
+		let memberId: string | undefined = undefined;
 		if (event.locals.user?.role === 'admin') {
 			originalOrgId = event.locals.session?.activeOrganizationId ?? undefined;
 			try {
-				await auth.api.addMember({
+				const result = await auth.api.addMember({
 					body: {
 						userId: event.locals.user?.id ?? '',
 						organizationId: oauthClient.referenceId!,
-						role: 'owner'
+						role: 'admin'
 					}
 				});
-			} catch {
-				//Ignore
+				memberId = result.id;
+			} catch (err) {
+				if (err instanceof APIError) {
+					if (err.body?.code === 'USER_IS_ALREADY_A_MEMBER_OF_THIS_ORGANIZATION') {
+						partOfOrg = true;
+					}
+				}
+				// Ignore
 			}
 			await auth.api.setActiveOrganization({
 				body: {
@@ -61,6 +69,20 @@ export const rotateClientSecret = command(z.string(), async (app) => {
 				},
 				headers: event.request.headers
 			});
+			if (!partOfOrg && memberId) {
+				try {
+					await auth.api.removeMember({
+						body: {
+							memberIdOrEmail: memberId,
+							organizationId: oauthClient.referenceId!
+						},
+						headers: event.request.headers
+					});
+				} catch (err) {
+					console.error(err);
+					//Ignore
+				}
+			}
 		}
 
 		setFlash({ type: 'success', message: 'Client secret rotated' }, event.cookies);

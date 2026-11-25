@@ -27,7 +27,7 @@
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 			<div class="flex flex-col gap-4 lg:col-span-1 lg:row-span-2">
-				<Card.Root class="relative mx-auto w-full  pt-0">
+				<Card.Root class="relative mx-auto w-full pt-0">
 					<div class="absolute inset-0 z-15 aspect-video bg-black/35"></div>
 					<img
 						src={data.app.logo_uri || 'https://placehold.co/600x400?text=No+Image'}

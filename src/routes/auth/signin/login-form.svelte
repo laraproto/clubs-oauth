@@ -3,6 +3,7 @@
 	import { FieldGroup, Field } from '#lib/components/ui/field/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
+	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
 	import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
 	import { formSchema, type FormSchema } from './schema';
@@ -20,7 +21,6 @@
 
 	let {
 		ref = $bindable(null),
-		// eslint-disable-next-line no-useless-assignment
 		email = $bindable(''),
 		class: className,
 		form: initialForm,
@@ -45,6 +45,7 @@
 					email = '';
 					return;
 				}
+				// eslint-disable-next-line
 				goto('', {
 					state: {
 						modal: true
@@ -55,7 +56,7 @@
 		}
 	);
 
-	const { form: formData, errors, message, enhance } = form;
+	const { form: formData, errors, message, enhance, submitting } = form;
 </script>
 
 <Head title="Club Member Login" />
@@ -102,7 +103,14 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<Field>
-			<Form.Button type="submit">Login</Form.Button>
+			<Form.Button type="submit">
+				{#if $submitting}
+					<Spinner class="me-2" />
+					Please wait, clubapi is slow
+				{:else}
+					Login
+				{/if}
+			</Form.Button>
 		</Field>
 	</form>
 	<FieldSeparator>Or continue with</FieldSeparator>

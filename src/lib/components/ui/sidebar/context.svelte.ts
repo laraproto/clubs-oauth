@@ -3,6 +3,7 @@ import { IsMobile } from '#lib/hooks/is-mobile.svelte.js';
 import { SIDEBAR_KEYBOARD_SHORTCUT } from './constants.js';
 import type { Auth } from '#lib/server/auth';
 import type { OAuthClient } from '@better-auth/oauth-provider';
+import type { Organization } from 'better-auth/plugins/organization';
 
 type Getter<T> = () => T;
 
@@ -15,6 +16,8 @@ export type SidebarStateProps = {
 	open: Getter<boolean>;
 
 	user: Getter<Auth['$Infer']['Session']['user']>;
+	session: Getter<Auth['$Infer']['Session']['session']>;
+	organizations: Getter<Organization[] | null>;
 
 	oauthClients: Getter<OAuthClient[] | null>;
 
@@ -30,6 +33,8 @@ class SidebarState {
 	readonly props: SidebarStateProps;
 	open = $derived.by(() => this.props.open());
 	user: Auth['$Infer']['Session']['user'] = $derived.by(() => this.props.user());
+	session: Auth['$Infer']['Session']['session'] = $derived.by(() => this.props.session());
+	organizations: Organization[] | null = $derived.by(() => this.props.organizations());
 	oauthClients: OAuthClient[] | null = $derived.by(() => this.props.oauthClients());
 	openMobile = $state(false);
 	setOpen: SidebarStateProps['setOpen'];

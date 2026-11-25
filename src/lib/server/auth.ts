@@ -94,6 +94,30 @@ export const auth = betterAuth({
 			loginPage: '/auth/signin',
 			consentPage: '/auth/consent',
 			allowPublicClientPrelogin: true,
+			advertisedMetadata: {
+				claims_supported: [
+					'sub',
+					'iss',
+					'aud',
+					'exp',
+					'iat',
+					'sid',
+					'scope',
+					'azp',
+					'name',
+					'picture',
+					'given_name',
+					'family_name',
+					'email',
+					'email_verified',
+					'club_name',
+					'club_role'
+				]
+			},
+			customUserInfoClaims: ({ user }) => ({
+				club_name: user?.clubName,
+				club_role: user?.clubRole
+			}),
 			clientReference: ({ session }) =>
 				(session?.activeOrganizationId as string | undefined) ?? undefined,
 			clientPrivileges
@@ -290,8 +314,7 @@ export const auth = betterAuth({
 			const [isMemberOk, isMemberError, isMember] = await clubApi.get('/member/email', {
 				queryParams: {
 					email: ctx.body.email
-				},
-				parseAs: 'text'
+				}
 			});
 
 			const [isLeaderOk, isLeaderError, isLeader] = await clubApi.get('/leader', {
@@ -308,9 +331,11 @@ export const auth = betterAuth({
 				});
 			}
 
+			console.log(isMember, isLeader);
+
 			// shitty ai code
 			const inAClub =
-				(isMember && isMember.length > 0) ||
+				(isMember.club_name && isMember.club_name.length > 0) ||
 				(typeof isLeader === 'object' &&
 					isLeader !== null &&
 					'club_name' in isLeader &&
