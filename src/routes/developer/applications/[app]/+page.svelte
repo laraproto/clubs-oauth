@@ -26,7 +26,7 @@
 {#if data.app}
 	<div class="container mx-auto my-8 flex flex-col gap-4 px-4">
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-			<div class="flex flex-col gap-4 lg:col-span-1 lg:row-span-2">
+			<div class="flex flex-col gap-4 lg:col-span-1 lg:row-span-3">
 				<Card.Root class="relative mx-auto w-full pt-0">
 					<div class="absolute inset-0 z-15 aspect-video bg-black/35"></div>
 					<img
@@ -46,15 +46,36 @@
 							{/if}
 						</Card.Title>
 					</Card.Header>
+					<Card.Footer>
+						<Button
+							href={resolve('/developer/applications/[app]/edit', { app: data.app?.client_id })}
+							class="w-full"
+						>
+							Edit App
+						</Button>
+					</Card.Footer>
 				</Card.Root>
-				<span class="flex justify-center">
-					<Button
-						href={resolve('/developer/applications/[app]/edit', { app: data.app?.client_id })}
-						class="w-full"
-					>
-						Edit App
-					</Button>
-				</span>
+				<Card.Root class="max-h-fit border border-destructive bg-destructive/20">
+					<Card.Header>
+						<Card.Title>Danger Zone</Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<Button
+							variant="destructive"
+							class="w-full"
+							onclick={() => (dialogState.revokeAccessTokensDialogOpen = true)}
+						>
+							Revoke Access Tokens
+						</Button>
+						<Button
+							variant="destructive"
+							class="mt-2 w-full"
+							onclick={() => (dialogState.deleteApplicationDialogOpen = true)}
+						>
+							Delete Application
+						</Button>
+					</Card.Content>
+				</Card.Root>
 			</div>
 			<div class="lg:col-span-2">
 				<Card.Root class="h-full">
@@ -156,29 +177,6 @@
 								</Tooltip.Root>
 							</div>
 						{/each}
-					</Card.Content>
-				</Card.Root>
-			</div>
-			<div class="lg:col-span-1">
-				<Card.Root class="h-full max-h-fit border border-destructive bg-destructive/20">
-					<Card.Header>
-						<Card.Title>Danger Zone</Card.Title>
-					</Card.Header>
-					<Card.Content>
-						<Button
-							variant="destructive"
-							class="w-full"
-							onclick={() => (dialogState.revokeAccessTokensDialogOpen = true)}
-						>
-							Revoke Access Tokens
-						</Button>
-						<Button
-							variant="destructive"
-							class="mt-2 w-full"
-							onclick={() => (dialogState.deleteApplicationDialogOpen = true)}
-						>
-							Delete Application
-						</Button>
 					</Card.Content>
 				</Card.Root>
 			</div>

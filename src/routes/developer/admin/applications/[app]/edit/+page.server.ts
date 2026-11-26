@@ -31,7 +31,8 @@ export const load = (async ({ params, cookies }) => {
 				uri: app.uri ?? undefined,
 				logo: app.icon ?? undefined,
 				scopes: app.scopes?.join(' '),
-				redirectUris: app.redirectUris
+				redirectUris: app.redirectUris,
+				skipConsent: app.skipConsent ?? false
 			},
 			zod4(editApplicationSchema),
 			{
@@ -59,7 +60,8 @@ export const actions = {
 						client_uri: form.data.uri ?? undefined,
 						logo_uri: form.data.logo ?? undefined,
 						scope: form.data.scopes,
-						redirect_uris: form.data.redirectUris
+						redirect_uris: form.data.redirectUris,
+						skip_consent: form.data.skipConsent
 					}
 				},
 				headers: event.request.headers
@@ -89,7 +91,7 @@ export const actions = {
 
 		return redirect(
 			303,
-			resolve(`/developer/applications/[app]`, { app: event.params.app }),
+			resolve(`/developer/admin/applications/[app]`, { app: event.params.app }),
 			{
 				type: 'success',
 				message: 'Application updated'

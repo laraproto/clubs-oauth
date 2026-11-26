@@ -14,7 +14,8 @@ export const editApplicationSchema = z.object({
 				message:
 					'One or more redirect URIs are invalid. They must start with "https://" or "http://".'
 			}
-		)
+		),
+	skipConsent: z.boolean().optional().default(false)
 });
 
 export type EditApplicationSchema = typeof editApplicationSchema;

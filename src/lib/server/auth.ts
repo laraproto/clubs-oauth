@@ -72,7 +72,25 @@ export const auth = betterAuth({
 		}),
 		admin(),
 		organization({
-			allowUserToCreateOrganization: false
+			allowUserToCreateOrganization: false,
+			async sendInvitationEmail({ id, email, organization, inviter, invitation }) {
+				const inviteLink = `${ORIGIN}/developer/organization/invite/${id}`;
+
+				const OrgInviteEmail = await import('#lib/emails/orgInvite.svelte');
+				void transporter.sendMail({
+					from: SMTP_FROM,
+					to: email,
+					subject: `You're invited to join ${organization.name}`,
+					html: await render(OrgInviteEmail.default, {
+						props: {
+							inviter: inviter.user.email,
+							organization: organization.name,
+							link: inviteLink,
+							expiration: invitation.expiresAt
+						}
+					})
+				});
+			}
 		}),
 		jwt({ disableSettingJwtHeader: true }),
 		emailOTP({
@@ -89,7 +107,9 @@ export const auth = betterAuth({
 					from: SMTP_FROM,
 					to: email,
 					subject: 'Your OTP Code',
-					html: await render(OtpEmail.default, { props: { code: otp, origin: ORIGIN } })
+					html: await render(OtpEmail.default, {
+						props: { code: otp, origin: ORIGIN, action: type }
+					})
 				});
 			}
 		}),
@@ -236,11 +256,11 @@ export const auth = betterAuth({
 							: null);
 
 					// eslint-disable-next-line no-useless-assignment
-					let clubRole: 'member' | 'leader' | null = null;
+					let clubRole: 'member' | 'leader' | 'co-leader' | null = null;
 					if (memberClub && memberClub.club_name && memberClub.club_name.length > 0) {
 						clubRole = 'member';
 					} else if (leaderClub && leaderClub.club_name && leaderClub.club_name.length > 0) {
-						clubRole = 'leader';
+						clubRole = leaderClub.role ?? null;
 					} else {
 						clubRole = null;
 					}
@@ -287,11 +307,11 @@ export const auth = betterAuth({
 							: null);
 
 					// eslint-disable-next-line no-useless-assignment
-					let clubRole: 'member' | 'leader' | null = null;
+					let clubRole: 'member' | 'leader' | 'co-leader' | null = null;
 					if (memberClub && memberClub.club_name && memberClub.club_name.length > 0) {
 						clubRole = 'member';
 					} else if (leaderClub && leaderClub.club_name && leaderClub.club_name.length > 0) {
-						clubRole = 'leader';
+						clubRole = leaderClub.role ?? null;
 					} else {
 						clubRole = null;
 					}

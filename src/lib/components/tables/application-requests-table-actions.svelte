@@ -27,7 +27,6 @@
 	let processWorking = $state(false);
 	let processOpen = $state(false);
 	let expectedAction = $state<'accept' | 'reject' | null>(null);
-	let reason = $state('');
 
 	const processApplication = async (action: 'accept' | 'reject') => {
 		if (processWorking) return;
@@ -108,7 +107,7 @@
 					>
 						Cancel
 					</Button>
-					<Button type="submit" disabled={processWorking || !reason.trim()}>
+					<Button type="submit" disabled={processWorking || !process_reason?.trim()}>
 						{#if processWorking}<Spinner />{/if}
 						Process Request
 					</Button>

@@ -16,6 +16,11 @@ export const processRequest = command(
 	async (app) => {
 		const event = getRequestEvent();
 
+		if (event.locals.user?.role !== 'admin') {
+			setFlash({ type: 'error', message: 'Unauthorized' }, event.cookies);
+			return false;
+		}
+
 		try {
 			const request = await db.query.applicationRequests.findFirst({
 				where: {

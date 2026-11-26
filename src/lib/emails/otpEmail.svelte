@@ -13,8 +13,16 @@
 		Img
 	} from '@better-svelte-email/components';
 
-	let { code = '000000', origin = 'http://localhost:5173' }: { code: string; origin: string } =
-		$props();
+	const actionMap = {
+		'sign-in': 'sign in',
+		'change-email': 'change your email address'
+	};
+
+	let {
+		code = '000000',
+		origin = 'http://localhost:5173',
+		action = 'sign-in'
+	}: { code: string; origin: string; action: 'sign-in' | 'change-email' } = $props();
 </script>
 
 <Html>
@@ -53,7 +61,7 @@
 						</Section>
 
 						<Text class="font-16 text-fg-2 mx-auto mt-0 mb-8 max-w-95 text-center font-sans">
-							Use the following OTP code to sign in
+							Use the following OTP code to {actionMap[action] ?? action}
 						</Text>
 						<Section class="bg-fg mx-auto mt-4 mb-3.5 w-70 rounded align-middle">
 							<Text

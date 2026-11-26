@@ -2,6 +2,8 @@
 	import * as Form from '#lib/components/ui/form/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
+	import * as Field from '#lib/components/ui/field/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { editApplicationSchema, type EditApplicationSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
@@ -92,6 +94,22 @@
 						<Form.Description>
 							Enter one or more redirect URIs, separated by new lines.
 						</Form.Description>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="skipConsent">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Field.Field orientation="horizontal">
+									<Checkbox {...props} bind:checked={$formData.skipConsent} />
+									<Field.Content>
+										<Field.Label for={props.id}>Skip Consent</Field.Label>
+										<Field.Description>
+											Whether to skip the consent page for this application.
+										</Field.Description>
+									</Field.Content>
+								</Field.Field>
+							{/snippet}
+						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
 				</div>

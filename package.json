@@ -44,6 +44,7 @@
 		"better-auth": "^1.7.28",
 		"bits-ui": "^2.22.0",
 		"cn": "^0.5.2",
+		"dayjs": "^1.11.23",
 		"drizzle-kit": "^1.0.0-rc.5",
 		"drizzle-orm": "^1.0.0-rc.5",
 		"eslint": "^10.15.0",

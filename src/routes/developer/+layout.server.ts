@@ -5,21 +5,11 @@ import type { LayoutServerLoad } from './$types';
 import { error, redirect } from '@sveltejs/kit';
 import type { OAuthClient } from '@better-auth/oauth-provider';
 import type { Organization } from 'better-auth/plugins/organization';
+import { resolve } from '$app/paths';
 
-export const load = (async ({ locals, request, cookies }) => {
+export const load = (async ({ locals, request, url, cookies }) => {
 	if (!locals.user || !locals.session) {
-		const result = await auth.api.signInSocial({
-			body: {
-				provider: 'hackclub',
-				callbackURL: '/developer'
-			},
-			headers: request.headers
-		});
-		if (result.url) {
-			return redirect(302, result.url, { external: true });
-		} else {
-			return redirect(302, '/');
-		}
+		return redirect(303, resolve(`/auth/signin?return_to=${encodeURIComponent(url.pathname)}`));
 	}
 
 	const cookie = cookies.get(SIDEBAR_COOKIE_NAME);
