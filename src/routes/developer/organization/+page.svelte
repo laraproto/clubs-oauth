@@ -3,6 +3,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import * as Avatar from '#lib/components/ui/avatar/index.js';
+	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
@@ -49,6 +50,8 @@
 	);
 
 	const { form: formData, enhance } = form;
+
+	const sidebar = Sidebar.useSidebar();
 </script>
 
 <Head title="Organization" />
@@ -102,6 +105,9 @@
 										</span>
 										{#if member.role !== 'owner'}
 											<Button variant="destructive" size="sm">Remove</Button>
+											<!-- eslint-disable-next-line svelte/no-dupe-else-if-blocks -->
+										{:else if member.userId == sidebar.user?.id && member.role !== 'owner'}
+											<Button variant="destructive" size="sm">Leave</Button>
 										{/if}
 									</span>
 								</div>
