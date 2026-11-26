@@ -4,8 +4,10 @@ Wrapper around hack club clubs api (would've been better if I could have just us
 
 ## Features required
 
-- [ ] Improve the chaos known as auth, particularly with hca
-- [ ] Add the club_name and club_role claims to the oauth server
+- [x] Improve the chaos known as auth, particularly with hca
+- [x] Add the club_name and club_role claims to the oauth server
+- [ ] Finish user page with revoke authorizations and hca linking
+- [ ] stats (pain)
 
 ## Development
 
